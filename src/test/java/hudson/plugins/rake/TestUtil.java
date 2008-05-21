@@ -22,7 +22,7 @@ public class TestUtil extends TestCase {
 		assertEquals(true, Util.isRakeInstalled(Util.getGemsDir("$JRUBY_HOME")));
 	}
 	
-	public void testDetectRubyInstallations() throws Exception {		
+	public void testDetectRubyInstallations() throws Exception {
 		assertEquals(2, Util.getRubyInstallations().size());
 	}
 	
