@@ -16,7 +16,11 @@ public final class RakeInstallation {
 	@DataBoundConstructor
 	public RakeInstallation(String name, String path) {
 		this.name = name;
-		this.path = path;
+		this.path = path;		
+	}
+	
+	public String toString() {
+		return name + ": " + path;
 	}
 	
 	public String getName() {
@@ -29,6 +33,17 @@ public final class RakeInstallation {
 	
 	public File getExecutable() {
         String execName = File.separatorChar == '\\'?"rake.bat":"rake";
-        return new File(getPath(), "bin/" + execName);
+        File parent = null;
+        if (isJruby()) {
+        	parent = new File(getPath());
+        } else {
+        	parent = new File(getPath()).getParentFile().getParentFile();        	
+        }
+        return new File(parent, "bin/" + execName);
     }
+	
+	private boolean isJruby() {
+		String execName = File.separatorChar == '\\'?"jruby.bat":"jruby";
+		return new File(getPath(), "bin/" + execName).exists();
+	}
 }

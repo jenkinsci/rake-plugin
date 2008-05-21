@@ -8,7 +8,7 @@
             <f:textbox name="rake.name" value="${rake.name}" />
           </f:entry>
 
-          <f:entry title="RAKE_HOME">
+          <f:entry title="RUBY_HOME">
             <f:textbox name="rake.path" value="${rake.path}"
               checkUrl="'builder/Rake/checkRakeInstallation?value='+escape(this.value)" />
           </f:entry>

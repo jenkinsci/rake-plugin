@@ -14,6 +14,7 @@ import hudson.util.FormFieldValidator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.servlet.ServletException;
 
@@ -45,7 +46,7 @@ public class Rake extends Builder {
     }
 	
 	private RakeInstallation getRake() {
-		for (RakeInstallation rake : getDescriptor().getInstalltions()) {
+		for (RakeInstallation rake : getDescriptor().getInstallations()) {
 			if (rakeInstallation != null && rake.getName().equals(rakeInstallation)) {
 				return rake;
 			}
@@ -59,7 +60,7 @@ public class Rake extends Builder {
         String normalizedTasks = tasks.replaceAll("[\t\r\n]+"," ");
                 
         RakeInstallation rake = getRake();
-        if (rake != null) {
+        if (rake != null) {        	
         	File exec = rake.getExecutable();
             if(!exec.exists()) {
                 listener.fatalError(exec + " doesn't exist");
@@ -94,6 +95,10 @@ public class Rake extends Builder {
 	
     public RakeDescriptor getDescriptor() {
         return DESCRIPTOR;
+    }
+    
+    public String getRakeInstallation() {
+    	return rakeInstallation;
     }
     
     public String getRakeFile() {
@@ -139,11 +144,11 @@ public class Rake extends Builder {
 		public boolean configure(StaplerRequest req) throws FormException {			
 			installations = req.bindParametersToList(
 				RakeInstallation.class, "rake.").toArray(new RakeInstallation[0]);
-			save();
+			save();			
 	        return true;
 		}
 		
-		public RakeInstallation[] getInstalltions() {
+		public RakeInstallation[] getInstallations() {
 			return installations;
 		}
 		
