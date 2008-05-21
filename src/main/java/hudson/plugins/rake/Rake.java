@@ -126,8 +126,8 @@ public class Rake extends Builder {
         private volatile RubyInstallation[] installations = new RubyInstallation[0];
 		
     	private RakeDescriptor() {
-            super(Rake.class);                          
-            load();                
+            super(Rake.class);
+            load();
         }
     	
     	@Override

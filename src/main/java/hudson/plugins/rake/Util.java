@@ -85,7 +85,11 @@ public class Util {
 						if (isJruby(parent.getParent())) {
 							parent = parent.getParentFile();
 						}
-						rubyVersions.add(parent);						
+						
+						File gemsDir = getGemsDir(parent.getAbsolutePath());
+						if (gemsDir != null && isRakeInstalled(gemsDir)) {
+							rubyVersions.add(parent);
+						}
 					}
 				}
 			}
@@ -98,7 +102,6 @@ public class Util {
 		try {
 			Collection<File> rubies = getRubyInstallations();
 			Collection<RubyInstallation> currentList = new ArrayList<RubyInstallation>();
-			currentList.addAll(Arrays.asList(currentInstallations));
 			
 			for (File ruby : rubies) {
 				currentList.add(new RubyInstallation(ruby.getName(), ruby.getAbsolutePath()));
