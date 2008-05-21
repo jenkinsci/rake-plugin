@@ -14,13 +14,16 @@ import hudson.util.FormFieldValidator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import static hudson.plugins.rake.Util.*;
 /**
  * Rake plugin main class.
  * 
@@ -45,8 +48,8 @@ public class Rake extends Builder {
         this.silent = silent;
     }
 	
-	private RakeInstallation getRake() {
-		for (RakeInstallation rake : getDescriptor().getInstallations()) {
+	private RubyInstallation getRake() {
+		for (RubyInstallation rake : getDescriptor().getInstallations()) {
 			if (rakeInstallation != null && rake.getName().equals(rakeInstallation)) {
 				return rake;
 			}
@@ -59,7 +62,7 @@ public class Rake extends Builder {
         ArgumentListBuilder args = new ArgumentListBuilder();
         String normalizedTasks = tasks.replaceAll("[\t\r\n]+"," ");
                 
-        RakeInstallation rake = getRake();
+        RubyInstallation rake = getRake();
         if (rake != null) {        	
         	File exec = rake.getExecutable();
             if(!exec.exists()) {
@@ -120,12 +123,18 @@ public class Rake extends Builder {
 	public static final class RakeDescriptor extends Descriptor<Builder> {	
     	
 		@CopyOnWrite
-        private volatile RakeInstallation[] installations = new RakeInstallation[0];
+        private volatile RubyInstallation[] installations = new RubyInstallation[0];
 		
     	private RakeDescriptor() {
-            super(Rake.class);
-            load();
+            super(Rake.class);                          
+            load();                
         }
+    	
+    	@Override
+		protected synchronized void load() {			
+			super.load();			
+			installations = getCanonicalRubies(installations);
+		}
 
         public String getDisplayName() {
             return "Invoke Rake";
@@ -141,18 +150,19 @@ public class Rake extends Builder {
         }
 
 		@Override
-		public boolean configure(StaplerRequest req) throws FormException {			
-			installations = req.bindParametersToList(
-				RakeInstallation.class, "rake.").toArray(new RakeInstallation[0]);
+		public boolean configure(StaplerRequest req) throws FormException {
+			installations = req.bindParametersToList(RubyInstallation.class, "rake.")
+				.toArray(new RubyInstallation[0]);
+			
 			save();			
 	        return true;
 		}
 		
-		public RakeInstallation[] getInstallations() {
+		public RubyInstallation[] getInstallations() {
 			return installations;
 		}
 		
-		public void doCheckRakeInstallation(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {        
+		public void doCheckRubyInstallation(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {        
 	        new FormFieldValidator(req,rsp,true) {
 	            public void check() throws IOException, ServletException {
 	                File f = getFileParameter("value");
@@ -160,15 +170,21 @@ public class Rake extends Builder {
 	                    error(f + " is not a directory");
 	                    return;
 	                }
-
-	                if(!new File(f,"bin/rake").exists() && !new File(f,"bin/rake.bat").exists()) {
-	                    error(f + " is not a Rake gem directory");
-	                    return;
+	                
+	                if (!hasGemsInstalled(f.getAbsolutePath())) {
+	                	error("It seems that ruby gems is not installed");
+	                	return;
 	                }
-
+	                
+	                if (!isRakeInstalled(getGemsDir(f.getAbsolutePath()))) {
+	                	error("It seems that rake is not installed");
+	                	return;
+	                }	                	                
+	                	                	                
 	                ok();
 	            }
 	        }.process();
 	    }
+		
     }	
 }
