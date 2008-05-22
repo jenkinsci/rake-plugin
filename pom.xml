@@ -12,35 +12,4 @@
   <packaging>hpi</packaging>
   <name>Hudson Rake plugin</name>
   <url>http://hudson.gotdns.com/wiki/display/HUDSON/Rake+Plugin</url>
-
-  <pluginRepositories>
-    <!-- We put the central repository first, as most artifacts will be
-         found there
-    -->
-    <pluginRepository>
-      <id>central</id>
-      <url>http://repo1.maven.org/maven2</url>
-      <releases>
-        <enabled>true</enabled>
-        <!-- only look for jars here when they are not present locally -->
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-
-    <pluginRepository>
-      <id>java.net2</id>
-      <url>http://download.java.net/maven/2</url>
-      <releases>
-        <enabled>true</enabled>
-        <!-- only look for jars here when they are not present locally -->
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
 </project>
