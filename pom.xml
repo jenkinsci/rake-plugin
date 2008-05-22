@@ -12,4 +12,18 @@
   <packaging>hpi</packaging>
   <name>Hudson Rake plugin</name>
   <url>http://hudson.gotdns.com/wiki/display/HUDSON/Rake+Plugin</url>
+
+   <repositories>
+    <repository>
+      <id>java.net2</id>
+      <url>http://download.java.net/maven/2/</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>
