@@ -16,14 +16,10 @@
 	</developer>
 	</developers>
   <scm>
-	<connection>
-		scm:svn:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake
-	</connection>
-	<developerConnection>
-		scm:cvs:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake
-	</developerConnection>
-	<url>https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake</url>
-  </scm>
+    <connection>scm:svn:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake/</connection>
+    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake/</developerConnection>
+    <url>https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake</url>
+  </scm>  
   
   <dependencies>
     <!--
