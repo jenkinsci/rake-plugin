@@ -1,9 +1,11 @@
 package hudson.plugins.rake;
 
-import java.util.Arrays;
-
 import junit.framework.TestCase;
-
+/**
+ * 
+ * @author David Calavera
+ *
+ */
 public class TestUtil extends TestCase {
 
 	public void testHasGemsInstalled() {
