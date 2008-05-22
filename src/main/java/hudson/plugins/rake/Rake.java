@@ -1,5 +1,9 @@
 package hudson.plugins.rake;
 
+import static hudson.plugins.rake.Util.getCanonicalRubies;
+import static hudson.plugins.rake.Util.getGemsDir;
+import static hudson.plugins.rake.Util.hasGemsInstalled;
+import static hudson.plugins.rake.Util.isRakeInstalled;
 import hudson.CopyOnWrite;
 import hudson.Launcher;
 import hudson.Util;
@@ -7,23 +11,18 @@ import hudson.model.Build;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
 import hudson.model.Project;
-import hudson.model.Descriptor.FormException;
 import hudson.tasks.Builder;
 import hudson.util.ArgumentListBuilder;
 import hudson.util.FormFieldValidator;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import static hudson.plugins.rake.Util.*;
 /**
  * Rake plugin main class.
  * 

@@ -1,7 +1,5 @@
 package hudson.plugins.rake;
 
-import static hudson.plugins.rake.Util.getRubyInstallations;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -12,6 +10,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+/**
+ * Ruby utility class. It's used to detect ruby local installations among other features.
+ * 
+ * @author David Calavera
+ */
 public class Util {
 	
 	private static String[] RUBY_EXECUTABLES = {"ruby", "jruby"};
