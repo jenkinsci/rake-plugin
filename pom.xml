@@ -5,6 +5,25 @@
   <artifactId>rake</artifactId>
   <packaging>hpi</packaging>
   <version>1.0</version>
+  <developers>
+	<developer>
+		<name>David Calavera</name>
+		<id>david_calavera</id>
+		<roles>
+			<role>Developer</role>
+		</roles>
+		<url>http://thinkincode.net</url>
+	</developer>
+	</developers>
+  <scm>
+	<connection>
+		scm:svn:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake
+	</connection>
+	<developerConnection>
+		scm:cvs:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake
+	</developerConnection>
+	<url>https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake</url>
+  </scm>
   
   <dependencies>
     <!--
