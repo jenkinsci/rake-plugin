@@ -1,10 +1,10 @@
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>hudson.plugins.rake</groupId>
   <artifactId>rake</artifactId>
   <packaging>hpi</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <developers>
 	<developer>
 		<name>David Calavera</name>
@@ -16,9 +16,9 @@
 	</developer>
 	</developers>
   <scm>
-    <connection>scm:svn:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake/</connection>
-    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake/</developerConnection>
-    <url>https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake</url>
+    <connection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/rake-1.0</connection>
+    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/rake-1.0</developerConnection>
+    <url>https://svn.dev.java.net/svn/hudson/tags/rake-1.0</url>
   </scm>  
   
   <dependencies>
