@@ -7,14 +7,14 @@
 	        <f:option selected="${inst.name == instance.rakeInstallation}">${inst.name}</f:option>
 	      </j:forEach>
 	    </select>
-  </f:entry>
-    <f:entry title="Rake file" description="Specify the rake file path, by default it's './Rakefile'">
-      <f:textbox name="rake.rakeFile" value="${instance.rakeFile}"/>
-    </f:entry>    
+  </f:entry>        
     <f:entry title="Tasks" description=" Specify Rake task(s) to run.">
     	<f:expandableTextbox name="rake.tasks" value="${instance.tasks}" />
   	</f:entry>
   	<f:advanced>
+  	    <f:entry title="Rake file" description="Specify the rake file path, by default it's './Rakefile'">
+          <f:textbox name="rake.rakeFile" value="${instance.rakeFile}"/>
+        </f:entry>
     	<f:entry title="Rake lib directory" description="Specify the rake lib directory, by default it's './rakelib'">
       		<f:textbox name="rake.rakeLibDir" value="${instance.rakeLibDir}"/>
     	</f:entry>
