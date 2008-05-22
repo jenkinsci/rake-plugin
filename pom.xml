@@ -4,7 +4,7 @@
   <groupId>hudson.plugins.rake</groupId>
   <artifactId>rake</artifactId>
   <packaging>hpi</packaging>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <developers>
 	<developer>
 		<name>David Calavera</name>
@@ -16,9 +16,9 @@
 	</developer>
 	</developers>
   <scm>
-    <connection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/rake-1.0</connection>
-    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/rake-1.0</developerConnection>
-    <url>https://svn.dev.java.net/svn/hudson/tags/rake-1.0</url>
+    <connection>scm:svn:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake/</connection>
+    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake/</developerConnection>
+    <url>https://svn.dev.java.net/svn/hudson/trunk/hudson/plugins/rake</url>
   </scm>  
   
   <dependencies>
