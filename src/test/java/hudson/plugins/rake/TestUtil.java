@@ -1,6 +1,7 @@
 package hudson.plugins.rake;
 
 import junit.framework.TestCase;
+import java.io.File;
 /**
  * 
  * @author David Calavera
@@ -9,7 +10,8 @@ import junit.framework.TestCase;
 public class TestUtil extends TestCase {
 
 	public void testHasGemsInstalled() {
-		assertEquals(true, Util.hasGemsInstalled("/usr/lib/ruby"));
+		if (execTest())
+			assertEquals(true, Util.hasGemsInstalled("/usr/lib/ruby"));
 	}
 	
 	public void testHasNotGemsInstalled() {
@@ -17,15 +19,21 @@ public class TestUtil extends TestCase {
 	}
 	
 	public void testIsRakeInstalled() {
-		assertEquals(true, Util.isRakeInstalled(Util.getGemsDir("/usr/lib/ruby")));
+		if (execTest())
+			assertEquals(true, Util.isRakeInstalled(Util.getGemsDir("/usr/lib/ruby")));
 	}
 	
 	public void testIsJrubyRakeInstalled() {
-		assertEquals(true, Util.isRakeInstalled(Util.getGemsDir("$JRUBY_HOME")));
+		if (System.getenv("JRUBY_HOME") != null)
+			assertEquals(true, Util.isRakeInstalled(Util.getGemsDir("$JRUBY_HOME")));
 	}
 	
 	public void testDetectRubyInstallations() throws Exception {
-		assertEquals(2, Util.getRubyInstallations().size());
+		if (execTest() && System.getenv("JRUBY_HOME") != null)
+			assertEquals(2, Util.getRubyInstallations().size());
 	}
 	
+	private boolean execTest() {
+		return new File("/usr/lib/ruby").exists();		
+	}
 }
