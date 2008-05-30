@@ -34,6 +34,8 @@ public class TestUtil extends TestCase {
 	}
 	
 	private boolean execTest() {
-		return new File("/usr/lib/ruby").exists();		
+                if(Boolean.getBoolean("rake.test.skip"))
+                    return false;
+                return new File("/usr/lib/ruby").exists();
 	}
 }
