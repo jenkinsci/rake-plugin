@@ -130,7 +130,7 @@ public class Rake extends Builder {
         }
     	
     	@Override
-		protected synchronized void load() {			
+		public synchronized void load() {
 			super.load();			
 			installations = getCanonicalRubies(installations);
 		}
