@@ -21,22 +21,13 @@ public class Util {
 	
 	public static File getExecutable(String path) {
         String execName = isWindows()?"rake.bat":"rake";
-        File parent = null;
-        if (isJruby(path)) {
-        	parent = new File(path);
-        } else {
-        	parent = new File(path).getParentFile().getParentFile();        	
-        }
+        File parent = isJruby(path)?new File(path) : new File(path).getParentFile().getParentFile();        
         return new File(parent, "bin/" + execName);
     }
 	
 	public static boolean isWindows() {
 		String name = System.getProperty("os.name");
-		if (name != null) {
-			return name.contains("Windows");
-		} else {
-			return File.separatorChar == '\\';
-		}
+		return name != null?name.contains("Windows") : File.separatorChar == '\\';		
 	}
 	
 	public static boolean isJruby(String path) {
@@ -49,15 +40,11 @@ public class Util {
 		return gems != null && gems.exists() && gems.isDirectory();
 	}
 	
-	public static File getGemsDir(String path) {
-		File gems = null;		
-		if (path.startsWith("$")) path = System.getenv(path.substring(1));
-		if (isJruby(path)) {
-			gems = new File(path + "/lib/ruby/gems/1.8");			
-		} else {
-			gems = new File(path + "/gems/1.8");
-		}	
-		return gems;
+	public static File getGemsDir(String path) {			
+		if (path.startsWith("$")) {
+			path = System.getenv(path.substring(1));
+		}
+		return isJruby(path)?new File(path + "/lib/ruby/gems/1.8") : new File(path + "/gems/1.8");		
 	}
 	
 	public static boolean isRakeInstalled(File gemsDir) {
