@@ -1,0 +1,11 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:rake="/hudson/plugins/rake/tags">
+    <f:entry title="Rake Version">
+	    <select class="setting-input" name="rake.rakeInstallation">
+	      <option>(Default)</option>
+	      <j:forEach var="inst" items="${descriptor.installations}">
+	        <f:option selected="${inst.name == instance.rakeInstallation}">${inst.name}</f:option>
+	      </j:forEach>
+	    </select>
+  </f:entry>
+</j:jelly>
