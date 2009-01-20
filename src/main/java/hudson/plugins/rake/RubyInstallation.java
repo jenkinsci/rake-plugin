@@ -1,6 +1,7 @@
 package hudson.plugins.rake;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -11,12 +12,12 @@ import org.kohsuke.stapler.DataBoundConstructor;
  */
 public final class RubyInstallation {
 	private final String name;
-	private final String path;
+	private final String path;	
 	
 	@DataBoundConstructor
 	public RubyInstallation(String name, String path) {
 		this.name = name;
-		this.path = path;
+		this.path = path;		
 	}
 	
 	public String getName() {
@@ -25,14 +26,13 @@ public final class RubyInstallation {
 	
 	public String getPath() {
 		return path;
-	}	
+	}
 	
 	public File getExecutable() {
 		return Util.getExecutable(getPath());
 	}
 	
-	public String toString() {
-		return "name: " + name + "\n"
-			+ "path: " + path + "\n";
-	}
+	public File getCanonicalExecutable() throws IOException {
+		return Util.getExecutable(getPath()).getCanonicalFile();
+	}	
 }
