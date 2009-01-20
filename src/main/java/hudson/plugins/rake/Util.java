@@ -3,7 +3,6 @@ package hudson.plugins.rake;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -28,6 +27,10 @@ public class Util {
 	public static boolean isWindows() {
 		String name = System.getProperty("os.name");
 		return name != null?name.contains("Windows") : File.separatorChar == '\\';		
+	}
+	
+	public static boolean isLinux() {
+		return System.getProperty("os.name").endsWith("Linux");
 	}
 	
 	public static boolean isJruby(String path) {
@@ -62,15 +65,15 @@ public class Util {
 	public static Collection<File> getRubyInstallations() throws IOException {
 		String systemPath = System.getenv("PATH");
 		if (systemPath == null) systemPath = System.getenv("path");
-		Collection<File> rubyVersions = new ArrayList<File>();
+		Collection<File> rubyVersions = new LinkedHashSet<File>();
 		
 		if (systemPath != null) {
 			Set<String> candidates = new LinkedHashSet<String>(Arrays.asList(systemPath.split(File.pathSeparator)));
 			for (String path : candidates) {
 				for (String ruby : RUBY_EXECUTABLES) {
-					File rubyExec = isWindows()?new File(path, ruby + ".exe"):new File(path, ruby);
+					File rubyExec = getExecutableWithExceptions(path, ruby);
 					if (rubyExec.isFile() && 
-							!rubyVersions.contains(rubyExec.getCanonicalFile().getParentFile())) {
+							!rubyVersions.contains(rubyExec.getCanonicalFile().getParentFile())) {						
 						File parent = rubyExec.getCanonicalFile().getParentFile();
 						if (isJruby(parent.getParent())) {
 							parent = parent.getParentFile();
@@ -91,20 +94,18 @@ public class Util {
 	public static RubyInstallation[] getCanonicalRubies(RubyInstallation[] currentInstallations) {
 		try {
 			Collection<File> rubies = getRubyInstallations();
-			Collection<RubyInstallation> currentList = new ArrayList<RubyInstallation>();
+			Collection<RubyInstallation> currentList = new LinkedHashSet<RubyInstallation>(Arrays.asList(currentInstallations));
 			
-			for (File ruby : rubies) {
+out:		for (File ruby : rubies) {
+				for (RubyInstallation current : currentList) {
+					if (current.getCanonicalExecutable().equals(getExecutable(ruby.getCanonicalPath()))) {
+						continue out;
+					}
+				}
 				currentList.add(new RubyInstallation(ruby.getName(), ruby.getAbsolutePath()));
 			}
-			
-			for (RubyInstallation current : currentList) {
-				File cur = new File(current.getPath());
-				if (!rubies.contains(cur.getCanonicalFile())) {
-					currentList.add(current);
-				}
-			}					
-			
-			return currentList.toArray(new RubyInstallation[0]);
+						
+			return currentList.toArray(new RubyInstallation[currentList.size()]);
 		} catch (IOException e) {
 			hudson.Util.displayIOException(e, null);    
 		}
@@ -123,6 +124,14 @@ public class Util {
 			hudson.Util.displayIOException(e, null);    
 		}
 		return false;
+	}
+	
+	private static File getExecutableWithExceptions(String path, String exec) {
+		File rubyExec = isWindows()?new File(path, exec + ".exe"):new File(path, exec);
+		if (isLinux() && rubyExec.exists() && rubyExec.getAbsolutePath().equals("/usr/bin/ruby")) {
+			rubyExec = new File("/usr/lib/ruby/ruby");
+		}
+		return rubyExec;
 	}
 	
 }
