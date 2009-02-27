@@ -5,6 +5,7 @@ import static hudson.plugins.rake.Util.getGemsDir;
 import static hudson.plugins.rake.Util.hasGemsInstalled;
 import static hudson.plugins.rake.Util.isRakeInstalled;
 import hudson.CopyOnWrite;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.model.Build;
@@ -35,15 +36,17 @@ public class Rake extends Builder {
 	private final String rakeInstallation;
 	private final String rakeFile;
 	private final String rakeLibDir;
-	private final String tasks;
-	private final boolean silent;
+	private final String rakeWorkingDir;
+    private final String tasks;
+    private final boolean silent;
 	
 	@DataBoundConstructor
-    public Rake(String rakeInstallation, String rakeFile, String tasks, String rakeLibDir, boolean silent) {
+    public Rake(String rakeInstallation, String rakeFile, String tasks, String rakeLibDir, String rakeWorkingDir, boolean silent) {
 		this.rakeInstallation = rakeInstallation;
         this.rakeFile = rakeFile;
         this.tasks = tasks;
         this.rakeLibDir = rakeLibDir;
+        this.rakeWorkingDir = rakeWorkingDir;
         this.silent = silent;
     }
 	
@@ -82,11 +85,18 @@ public class Rake extends Builder {
         if (silent) {
         	args.add("--silent");
         }
-        
+
+        FilePath workingDir = proj.getModuleRoot();
+
+        if (rakeWorkingDir != null && rakeWorkingDir.length() > 0) {
+            workingDir = new FilePath(proj.getModuleRoot(), rakeWorkingDir);
+        }
+
+
         args.addTokenized(normalizedTasks);
         
         try {
-            int r = launcher.launch(args.toCommandArray(), build.getEnvVars(), listener.getLogger(), proj.getModuleRoot()).join();
+            int r = launcher.launch(args.toCommandArray(), build.getEnvVars(), listener.getLogger(), workingDir).join();
             return r == 0;
         } catch (IOException e) {
             Util.displayIOException(e,listener);
@@ -118,7 +128,11 @@ public class Rake extends Builder {
 	public boolean isSilent() {
 		return silent;
 	}	
-   
+
+    public String getRakeWorkingDir() {
+        return rakeWorkingDir;
+    }
+
 	public static final class RakeDescriptor extends Descriptor<Builder> {	
     	
 		@CopyOnWrite
