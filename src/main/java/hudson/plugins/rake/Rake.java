@@ -21,6 +21,8 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
+import net.sf.json.JSONObject;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -153,8 +155,12 @@ public class Rake extends Builder {
             return "Invoke Rake";
         }
         
-        public Builder newInstance(StaplerRequest req) {            
-        	return req.bindParameters(Rake.class,"rake.");
+        // public Builder newInstance(StaplerRequest req) {            
+        //          return req.bindParameters(Rake.class,"rake.");
+        //         }
+        
+        public Rake newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+            return (Rake)req.bindJSON(clazz,formData);
         }
         
         @Override
