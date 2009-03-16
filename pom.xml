@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>rake</artifactId>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.5</version>
   <packaging>hpi</packaging>
   <name>Hudson Rake plugin</name>
   <url>http://hudson.gotdns.com/wiki/display/HUDSON/Rake+Plugin</url>
@@ -40,8 +40,8 @@
   </build>
 
   <scm>
-    <connection>scm:svn:https://guest@svn.dev.java.net/svn/hudson/tags/rake-1.4</connection>
-    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/rake-1.4</developerConnection>
-    <url>https://hudson.dev.java.net/source/browse/hudson/hudson/plugins/rake/tags/rake-1.4</url>
+    <connection>scm:svn:https://guest@svn.dev.java.net/svn/hudson/tags/rake-1.5</connection>
+    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/rake-1.5</developerConnection>
+    <url>https://hudson.dev.java.net/source/browse/hudson/hudson/plugins/rake/tags/rake-1.5</url>
   </scm>
 </project>
