@@ -1,6 +1,7 @@
 package hudson.plugins.rake;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -39,24 +40,27 @@ public class TestUtil extends TestCase {
 		}
 	}
 	
-	public void testGetCanonicalRubies() {
+	public void testGetCanonicalRubies() throws IOException {
 		if (execTest() && System.getenv("JRUBY_HOME") != null) {
 			File file = new File(System.getenv("JRUBY_HOME") + "/bin/jruby");
-			RubyInstallation jruby = new RubyInstallation(file.getName(), file.getAbsolutePath());
-			
-			assertEquals(2, Util.getCanonicalRubies(new RubyInstallation[]{jruby}).length);
+			RubyInstallation jruby = new RubyInstallation(file.getName(), file.getCanonicalPath());
+			int rubies = Util.getCanonicalRubies(new RubyInstallation[]{jruby}).length;
+
+			assertEquals(2, rubies);
 		}
 	}
 	
-	public void testGetCanonicalRubiesLinked() {
+	public void testGetCanonicalRubiesLinked() throws IOException {
 		if (execTest()) {
 			File file = new File("/usr/bin/ruby");
-			RubyInstallation ruby = new RubyInstallation(file.getName(), file.getAbsolutePath());
+			String path = !Util.isMac()? file.getCanonicalPath() : 
+			    file.getCanonicalFile().getParentFile().getParentFile().getCanonicalPath();
+			RubyInstallation ruby = new RubyInstallation(file.getName(), path);
 			Collection<RubyInstallation> rubies = new ArrayList<RubyInstallation>();
 			rubies.add(ruby);
 			if (System.getenv("JRUBY_HOME") != null) {
 				file = new File(System.getenv("JRUBY_HOME") + "/bin/jruby");
-				RubyInstallation jruby = new RubyInstallation(file.getName(), file.getAbsolutePath());
+				RubyInstallation jruby = new RubyInstallation(file.getName(), file.getCanonicalPath());
 				rubies.add(jruby);
 			}
 			
@@ -65,8 +69,8 @@ public class TestUtil extends TestCase {
 	}
 	
 	private boolean execTest() {
-                if(Boolean.getBoolean("rake.test.skip"))
-                    return false;
+           //     if(Boolean.getBoolean("rake.test.skip"))
+            //        return false;
                 return new File("/usr/lib/ruby").exists();
 	}
 }
