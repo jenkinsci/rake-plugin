@@ -16,12 +16,20 @@ import java.util.regex.Pattern;
  */
 public class Util {
 	
-	private static final String[] RUBY_EXECUTABLES = {"ruby", "jruby"};
+	private static final String[] RUBY_EXECUTABLES = {"ruby(?:[\\w-_.]+)?", "jruby"};
 	
 	public static File getExecutable(String path) {
-        String execName = isWindows()?"rake.bat":"rake";
-            File parent = isJruby(path)?new File(path) : new File(path).getParentFile().getParentFile();        
-        return new File(parent, "bin/" + execName);
+	    String rakePattern = "rake(?:[\\w-_.]+)?";
+        String execName = isWindows() ? rakePattern + ".bat" : rakePattern;
+        
+        File parent = isJruby(path)? new File(path) : new File(path).getParentFile().getParentFile();
+        File bin = new File(parent, "bin");
+        FilenameFilter filter = new RegexFilenameFilter(execName);
+                
+        File[] candidates = bin.listFiles(filter);
+        File rake = candidates != null && candidates.length > 0 ? candidates[0] : new File(bin, "rake");
+        
+        return rake;
     }
 	
 	public static boolean isWindows() {
@@ -58,14 +66,29 @@ public class Util {
 		}
 		File[] gemDirsFiltered = new File[0];
 		
-	    for (File gemsBaseFile : new File []{new File(path + "/lib/ruby/gems"), new File(path + "/gems")}) {
+		File gemsBaseFile = new File(path + "/gems");
+		if (gemsBaseFile.exists()) {
+		    gemDirsFiltered = gemsBaseFile.listFiles(gemDirFilter);
+		} else {
+		    gemsBaseFile = new File(path + "/lib");
 		    if (gemsBaseFile.exists()) {
-    		    gemDirsFiltered = gemsBaseFile.listFiles(gemDirFilter);
-    		    if (gemDirsFiltered.length > 0) {
-    		        break;
-    		    }
-    		}
-	    }
+		        FilenameFilter filter = new RegexFilenameFilter("ruby(?:[\\w-_.]+)?");
+		        File[] gemsCustomDir = gemsBaseFile.listFiles(filter);
+		        if (gemsCustomDir.length > 0) {
+		            gemsCustomDir = gemsCustomDir[0].listFiles(new RegexFilenameFilter("gems"));
+		            gemDirsFiltered = gemsCustomDir[0].listFiles(new RegexFilenameFilter("\\d+.\\d+(?:.\\d+)?"));
+		        }
+	        }
+		}
+		
+	    // for (File gemsBaseFile : new File []{new File(path + "/lib/ruby/gems"), new File(path + "/gems")}) {
+	    //             if (gemsBaseFile.exists()) {
+	    //                 gemDirsFiltered = gemsBaseFile.listFiles(gemDirFilter);
+	    //                 if (gemDirsFiltered.length > 0) {
+	    //                     break;
+	    //                 }
+	    //             }
+	    //         }
 		
 		return gemDirsFiltered;	
 	}
@@ -73,7 +96,7 @@ public class Util {
 	public static boolean isRakeInstalled(File... gemsDirArray) {
 	    for (File gemsDir : gemsDirArray) {
 		    File specPath = new File(gemsDir, "specifications");
-		    if (specPath.exists() && specPath.listFiles(rakeFilter) != null) {
+		    if (specPath.exists() && specPath.listFiles(new RegexFilenameFilter("rake\\-([\\d.]+).gemspec")) != null) {
 		        return true;
 		    }
 	    }
@@ -161,11 +184,32 @@ out:	    for (File ruby : rubies) {
 	}
 	
 	private static File getExecutableWithExceptions(String path, String exec) throws IOException {
-		File rubyExec = isWindows()?new File(path, exec + ".exe"):new File(path, exec);
-		if (isLinux() && rubyExec.exists() && rubyExec.getAbsolutePath().equals("/usr/bin/ruby")) {
-			rubyExec = new File("/usr/lib/ruby/ruby");
-		}
+		// File rubyExec = isWindows()?new File(path, exec + ".exe"):new File(path, exec);
+		//        if (isLinux() && rubyExec.exists() && rubyExec.getAbsolutePath().equals("/usr/bin/ruby")) {
+		//            rubyExec = new File("/usr/lib/ruby/ruby");
+		//        }
+		File binPath = new File(path);
+		FilenameFilter filter = new RegexFilenameFilter(isWindows() ? exec + ".exe" : exec);
+		
+		File[] candidates = binPath.listFiles(filter);
+		File rubyExec = candidates.length > 0 ? candidates[0] : 
+		    isWindows()?new File(path, exec + ".exe"):new File(path, exec);
+		
 		return rubyExec;
 	}
+	
+ 	private static class RegexFilenameFilter implements FilenameFilter {
+ 	    private final String rubyName;
+ 	    private final Pattern rubyPattern;
+ 	    
+ 	    public RegexFilenameFilter(String rubyName) {
+ 	        this.rubyName = rubyName;
+ 	        rubyPattern = Pattern.compile(rubyName);
+ 	    }
+ 	    
+        public boolean accept(File path, String file) {			
+			return rubyPattern.matcher(file).matches();
+		}
+    }
 	
 }
