@@ -94,7 +94,6 @@ public class Rake extends Builder {
             workingDir = new FilePath(proj.getModuleRoot(), rakeWorkingDir);
         }
 
-
         args.addTokenized(normalizedTasks);
         
         try {
@@ -154,10 +153,6 @@ public class Rake extends Builder {
         public String getDisplayName() {
             return "Invoke Rake";
         }
-        
-        // public Builder newInstance(StaplerRequest req) {            
-        //          return req.bindParameters(Rake.class,"rake.");
-        //         }
         
         public Rake newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             return (Rake)req.bindJSON(clazz,formData);

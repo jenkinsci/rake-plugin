@@ -35,7 +35,7 @@ public class TestUtil extends TestCase {
 	public void testDetectRubyInstallations() throws Exception {
 		if (execTest()) {			
 			int expected = System.getenv("JRUBY_HOME") != null 
-				&& System.getenv("PATH").contains(System.getenv("JRUBY_HOME"))?2:1;
+				&& System.getenv("PATH").contains(System.getenv("JRUBY_HOME"))?3:2;
 			assertEquals(expected, Util.getRubyInstallations().size());
 		}
 	}
@@ -46,7 +46,7 @@ public class TestUtil extends TestCase {
 			RubyInstallation jruby = new RubyInstallation(file.getName(), file.getCanonicalPath());
 			int rubies = Util.getCanonicalRubies(new RubyInstallation[]{jruby}).length;
 
-			assertEquals(2, rubies);
+			assertEquals(3, rubies);
 		}
 	}
 	
@@ -64,13 +64,13 @@ public class TestUtil extends TestCase {
 				rubies.add(jruby);
 			}
 			
-			assertEquals(rubies.size(), Util.getCanonicalRubies(rubies.toArray(new RubyInstallation[rubies.size()])).length);
+			assertEquals(3, Util.getCanonicalRubies(rubies.toArray(new RubyInstallation[rubies.size()])).length);
 		}
 	}
 	
 	private boolean execTest() {
-           //     if(Boolean.getBoolean("rake.test.skip"))
-            //        return false;
-                return new File("/usr/lib/ruby").exists();
+        if(Boolean.getBoolean("rake.test.skip"))
+            return false;
+        return new File("/usr/lib/ruby").exists();
 	}
 }
