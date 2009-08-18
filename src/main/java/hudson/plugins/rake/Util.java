@@ -16,11 +16,11 @@ import java.util.regex.Pattern;
  */
 public class Util {
 	
-	private static String[] RUBY_EXECUTABLES = {"ruby", "jruby"};
+	private static final String[] RUBY_EXECUTABLES = {"ruby", "jruby"};
 	
 	public static File getExecutable(String path) {
         String execName = isWindows()?"rake.bat":"rake";
-        File parent = isJruby(path)?new File(path) : new File(path).getParentFile().getParentFile();        
+            File parent = isJruby(path)?new File(path) : new File(path).getParentFile().getParentFile();        
         return new File(parent, "bin/" + execName);
     }
 	
@@ -33,32 +33,64 @@ public class Util {
 		return System.getProperty("os.name").endsWith("Linux");
 	}
 	
+	public static boolean isMac() {
+	    return System.getProperty("os.name").equalsIgnoreCase("Mac OS X");
+	}
+	
 	public static boolean isJruby(String path) {
 		String execName = isWindows()?"jruby.bat":"jruby";
 		return new File(path, "bin/" + execName).exists();
 	}
 	
 	public static boolean hasGemsInstalled(String path) {
-		File gems = getGemsDir(path);
-		return gems != null && gems.exists() && gems.isDirectory();
+		File[] gems = getGemsDir(path);
+		for (File gem : gems) {
+		    if (gem != null && gem.exists() && gem.isDirectory()) {
+		        return true;
+		    }
+	    }
+	    return false;
 	}
 	
-	public static File getGemsDir(String path) {			
+	public static File[] getGemsDir(String path) {			
 		if (path.startsWith("$")) {
 			path = System.getenv(path.substring(1));
 		}
-		return isJruby(path)?new File(path + "/lib/ruby/gems/1.8") : new File(path + "/gems/1.8");		
+		File[] gemDirsFiltered = new File[0];
+		
+	    for (File gemsBaseFile : new File []{new File(path + "/lib/ruby/gems"), new File(path + "/gems")}) {
+		    if (gemsBaseFile.exists()) {
+    		    gemDirsFiltered = gemsBaseFile.listFiles(gemDirFilter);
+    		    if (gemDirsFiltered.length > 0) {
+    		        break;
+    		    }
+    		}
+	    }
+		
+		return gemDirsFiltered;	
 	}
 	
-	public static boolean isRakeInstalled(File gemsDir) {
-		File specPath = new File(gemsDir, "specifications");
-		return specPath.exists() && specPath.listFiles(rakeFilter) != null;		
+	public static boolean isRakeInstalled(File... gemsDirArray) {
+	    for (File gemsDir : gemsDirArray) {
+		    File specPath = new File(gemsDir, "specifications");
+		    if (specPath.exists() && specPath.listFiles(rakeFilter) != null) {
+		        return true;
+		    }
+	    }
+	    return false;
 	}
 	
 	private static FilenameFilter rakeFilter = new FilenameFilter() {
-		Pattern rakePattern = Pattern.compile("rake\\-([\\d.]+).gemspec");
+		private final Pattern rakePattern = Pattern.compile("rake\\-([\\d.]+).gemspec");
 		public boolean accept(File path, String file) {			
 			return rakePattern.matcher(file).matches();
+		}
+	};
+	
+	private static FilenameFilter gemDirFilter = new FilenameFilter() {
+	    Pattern gemVersionPattern = Pattern.compile("\\d+.\\d+(?:.\\d+)?");
+	    public boolean accept(File path, String file) {			
+			return gemVersionPattern.matcher(file).matches();
 		}
 	};
 	
@@ -73,13 +105,15 @@ public class Util {
 				for (String ruby : RUBY_EXECUTABLES) {
 					File rubyExec = getExecutableWithExceptions(path, ruby);
 					if (rubyExec.isFile() && 
-							!rubyVersions.contains(rubyExec.getCanonicalFile().getParentFile())) {						
+							!rubyVersions.contains(rubyExec.getCanonicalFile().getParentFile())) {
 						File parent = rubyExec.getCanonicalFile().getParentFile();
-						if (isJruby(parent.getParent())) {
-							parent = parent.getParentFile();
-						}
+						File[] gemsDir = getGemsDir(parent.getAbsolutePath());
 						
-						File gemsDir = getGemsDir(parent.getAbsolutePath());
+						if (!isRakeInstalled(gemsDir) && (isMac() || isJruby(parent.getParent()))) {
+							parent = parent.getParentFile();
+							gemsDir = getGemsDir(parent.getAbsolutePath());
+						}
+						 
 						if (gemsDir != null && isRakeInstalled(gemsDir)) {
 							rubyVersions.add(parent);
 						}
@@ -96,15 +130,15 @@ public class Util {
 			Collection<File> rubies = getRubyInstallations();
 			Collection<RubyInstallation> currentList = new LinkedHashSet<RubyInstallation>(Arrays.asList(currentInstallations));
 			
-out:		for (File ruby : rubies) {
+out:	    for (File ruby : rubies) {
 				for (RubyInstallation current : currentList) {
-					if (current.getCanonicalExecutable().equals(getExecutable(ruby.getCanonicalPath()))) {
+					if (current.getCanonicalExecutable().equals(getExecutable(ruby.getCanonicalPath()).getCanonicalFile())) {
 						continue out;
 					}
 				}
-				currentList.add(new RubyInstallation(ruby.getName(), ruby.getAbsolutePath()));
+				currentList.add(new RubyInstallation(ruby.getName(), ruby.getCanonicalPath()));
 			}
-						
+					
 			return currentList.toArray(new RubyInstallation[currentList.size()]);
 		} catch (IOException e) {
 			hudson.Util.displayIOException(e, null);    
@@ -126,7 +160,7 @@ out:		for (File ruby : rubies) {
 		return false;
 	}
 	
-	private static File getExecutableWithExceptions(String path, String exec) {
+	private static File getExecutableWithExceptions(String path, String exec) throws IOException {
 		File rubyExec = isWindows()?new File(path, exec + ".exe"):new File(path, exec);
 		if (isLinux() && rubyExec.exists() && rubyExec.getAbsolutePath().equals("/usr/bin/ruby")) {
 			rubyExec = new File("/usr/lib/ruby/ruby");
