@@ -107,7 +107,7 @@ public class Util {
 					if (rubyExec.isFile() && 
 							!rubyVersions.contains(rubyExec.getCanonicalFile().getParentFile())) {
 						File parent = rubyExec.getCanonicalFile().getParentFile();
-						File[] gemsDir = getGemsDir(parent.getAbsolutePath());
+						File[] gemsDir = getGemsDir(parent.getCanonicalPath());
 						
 						if (!isRakeInstalled(gemsDir) && (isMac() || isJruby(parent.getParent()))) {
 							parent = parent.getParentFile();
@@ -149,8 +149,7 @@ out:	    for (File ruby : rubies) {
 	public static boolean isAlreadyInstalled(RubyInstallation[] current, String path) {
 		try {
 			for (RubyInstallation ruby : current) {
-				if (new File(ruby.getPath()).getCanonicalPath()
-						.equals(new File(path).getCanonicalPath())) {
+				if (new File(ruby.getPath()).getCanonicalPath().equals(new File(path).getCanonicalPath())) {
 					return true;
 				}
 			}
