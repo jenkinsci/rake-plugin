@@ -19,7 +19,8 @@ public class TestUtil extends TestCase {
 	}
 	
 	public void testHasNotGemsInstalled() {
-		assertEquals(false, Util.hasGemsInstalled("/usr/lib"));
+    if (execTest())
+		    assertEquals(false, Util.hasGemsInstalled("/usr/lib"));
 	}
 	
 	public void testIsRakeInstalled() {
@@ -28,7 +29,7 @@ public class TestUtil extends TestCase {
 	}
 	
 	public void testIsJrubyRakeInstalled() {
-		if (System.getenv("JRUBY_HOME") != null)
+		if (execTest() && System.getenv("JRUBY_HOME") != null)
 			assertEquals(true, Util.isRakeInstalled(Util.getGemsDir("$JRUBY_HOME")));
 	}
 	
