@@ -12,6 +12,14 @@
   <packaging>hpi</packaging>
   <name>Hudson Rake plugin</name>
   <url>http://wiki.hudson-ci.org/display/HUDSON/Rake+Plugin</url>
+  
+  <developers>
+    <developer>
+      <id>david_calavera</id>
+      <name>David Calavera</name>
+      <email>calavera@apache.org</email>
+    </developer>
+  </developers>
 
   <build>
     <plugins>
