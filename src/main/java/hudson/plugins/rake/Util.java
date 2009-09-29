@@ -61,7 +61,7 @@ public class Util {
 	    for (File gemsBaseFile : new File []{new File(path + "/lib/ruby/gems"), new File(path + "/gems")}) {
 		    if (gemsBaseFile.exists()) {
     		    gemDirsFiltered = gemsBaseFile.listFiles(gemDirFilter);
-    		    if (gemDirsFiltered.length > 0) {
+    		    if (gemDirsFiltered != null && gemDirsFiltered.length > 0) {
     		        break;
     		    }
     		}
