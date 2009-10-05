@@ -5,27 +5,27 @@ import static hudson.plugins.rake.Util.getGemsDir;
 import static hudson.plugins.rake.Util.hasGemsInstalled;
 import static hudson.plugins.rake.Util.isRakeInstalled;
 import hudson.CopyOnWrite;
+import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
-import hudson.model.Build;
+import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
-import hudson.model.Project;
+import hudson.model.Hudson;
 import hudson.tasks.Builder;
 import hudson.util.ArgumentListBuilder;
-import hudson.util.FormFieldValidator;
+import hudson.util.FormValidation;
 
 import java.io.File;
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-
 import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+
 /**
  * Rake plugin main class.
  * 
@@ -34,7 +34,8 @@ import org.kohsuke.stapler.StaplerResponse;
 @SuppressWarnings({"unchecked", "serial"})
 public class Rake extends Builder {
 
-	public static final RakeDescriptor DESCRIPTOR = new RakeDescriptor();
+    @Extension
+    public static final RakeDescriptor DESCRIPTOR = new RakeDescriptor();
 	private final String rakeInstallation;
 	private final String rakeFile;
 	private final String rakeLibDir;
@@ -60,9 +61,9 @@ public class Rake extends Builder {
 		}
 		return null;
 	}
-	
-	public boolean perform(Build<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException {
-		Project proj = build.getProject();
+
+	@Override
+	public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException {
         ArgumentListBuilder args = new ArgumentListBuilder();
         String normalizedTasks = tasks.replaceAll("[\t\r\n]+"," ");
                 
@@ -88,16 +89,16 @@ public class Rake extends Builder {
         	args.add("--silent");
         }
 
-        FilePath workingDir = proj.getModuleRoot();
+        FilePath workingDir = build.getModuleRoot();
 
         if (rakeWorkingDir != null && rakeWorkingDir.length() > 0) {
-            workingDir = new FilePath(proj.getModuleRoot(), rakeWorkingDir);
+            workingDir = new FilePath(build.getModuleRoot(), rakeWorkingDir);
         }
 
         args.addTokenized(normalizedTasks);
         
         try {
-            int r = launcher.launch(args.toCommandArray(), build.getEnvVars(), listener.getLogger(), workingDir).join();
+            int r = launcher.launch().cmds(args).envs(build.getEnvironment(listener)).stdout(listener).pwd(workingDir).join();
             return r == 0;
         } catch (IOException e) {
             Util.displayIOException(e,listener);
@@ -106,6 +107,7 @@ public class Rake extends Builder {
         }
 	}	
 	
+    @Override
     public RakeDescriptor getDescriptor() {
         return DESCRIPTOR;
     }
@@ -154,6 +156,7 @@ public class Rake extends Builder {
             return "Invoke Rake";
         }
         
+        @Override
         public Rake newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             return (Rake)req.bindJSON(clazz,formData);
         }
@@ -164,7 +167,7 @@ public class Rake extends Builder {
         }
 
 		@Override
-		public boolean configure(StaplerRequest req) throws FormException {
+		public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
 			installations = req.bindParametersToList(RubyInstallation.class, "rake.")
 				.toArray(new RubyInstallation[0]);
 			
@@ -176,29 +179,23 @@ public class Rake extends Builder {
 			return installations;
 		}
 		
-		public void doCheckRubyInstallation(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {        
-	        new FormFieldValidator(req,rsp,true) {
-	            public void check() throws IOException, ServletException {
-	                File f = getFileParameter("value");
-	                if(!f.isDirectory()) {
-	                    error(f + " is not a directory");
-	                    return;
-	                }
-	                
-	                if (!hasGemsInstalled(f.getAbsolutePath())) {
-	                	error("It seems that ruby gems is not installed");
-	                	return;
-	                }
-	                
-	                if (!isRakeInstalled(getGemsDir(f.getAbsolutePath()))) {
-	                	error("It seems that rake is not installed");
-	                	return;
-	                }	                	                
-	                	                	                
-	                ok();
+		public FormValidation doCheckRubyInstallation(@QueryParameter final String value) {
+	            if (!Hudson.getInstance().hasPermission(Hudson.ADMINISTER)) return FormValidation.ok();
+	            File f = new File(Util.fixNull(value));
+	            if(!f.isDirectory()) {
+	                return FormValidation.error(f + " is not a directory");
 	            }
-	        }.process();
-	    }
+	            
+	            if (!hasGemsInstalled(f.getAbsolutePath())) {
+	               	return FormValidation.error("It seems that ruby gems is not installed");
+	            }
+	            
+	            if (!isRakeInstalled(getGemsDir(f.getAbsolutePath()))) {
+	                return FormValidation.error("It seems that rake is not installed");
+	            }	                	                
+	                	                	                
+	            return FormValidation.ok();
+	        }
 		
     }	
 }
