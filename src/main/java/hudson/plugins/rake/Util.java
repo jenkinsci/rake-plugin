@@ -58,7 +58,7 @@ public class Util {
 		}
 		File[] gemDirsFiltered = new File[0];
 		
-	    for (File gemsBaseFile : new File []{new File(path + "/lib/ruby/gems"), new File(path + "/gems")}) {
+	    for (File gemsBaseFile : getDefaultGemPaths(path)) {
 		    if (gemsBaseFile.exists()) {
     		    gemDirsFiltered = gemsBaseFile.listFiles(gemDirFilter);
     		    if (gemDirsFiltered != null && gemDirsFiltered.length > 0) {
@@ -67,7 +67,11 @@ public class Util {
     		}
 	    }
 		
-		return gemDirsFiltered;	
+		return gemDirsFiltered != null ? gemDirsFiltered : new File[0];	
+	}
+	
+	public static File[] getDefaultGemPaths(String path) {
+	    return new File []{new File(path + "/lib/ruby/gems"), new File(path + "/gems")};
 	}
 	
 	public static boolean isRakeInstalled(File... gemsDirArray) {
