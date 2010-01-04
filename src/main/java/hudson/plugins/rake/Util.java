@@ -19,18 +19,18 @@ public class Util {
 	private static final String[] RUBY_EXECUTABLES = {"ruby", "jruby"};
 	
 	public static File getExecutable(String path) {
-        String execName = isWindows()?"rake.bat":"rake";
-            File parent = isJruby(path)?new File(path) : new File(path).getParentFile().getParentFile();        
-        return new File(parent, "bin/" + execName);
-    }
+      String execName = isWindows()?"rake.bat":"rake";
+      File parent = isJruby(path) || isCustom(path, execName)? new File(path) : new File(path).getParentFile().getParentFile();
+      return new File(parent, "bin/" + execName);
+  }
 	
 	public static boolean isWindows() {
-		String name = System.getProperty("os.name");
-		return name != null?name.contains("Windows") : File.separatorChar == '\\';		
+		  String name = System.getProperty("os.name");
+		  return name != null?name.contains("Windows") : File.separatorChar == '\\';
 	}
 	
 	public static boolean isLinux() {
-		return System.getProperty("os.name").endsWith("Linux");
+		  return System.getProperty("os.name").endsWith("Linux");
 	}
 	
 	public static boolean isMac() {
@@ -38,9 +38,13 @@ public class Util {
 	}
 	
 	public static boolean isJruby(String path) {
-		String execName = isWindows()?"jruby.bat":"jruby";
-		return new File(path, "bin/" + execName).exists();
+		  String execName = isWindows()?"jruby.bat":"jruby";
+		  return new File(path, "bin/" + execName).exists();
 	}
+
+  public static boolean isCustom(String path, String execName) {
+      return new File(path, "bin/" + execName).exists();
+  }
 	
 	public static boolean hasGemsInstalled(String path) {
 		File[] gems = getGemsDir(path);
@@ -52,7 +56,7 @@ public class Util {
 	    return false;
 	}
 	
-	public static File[] getGemsDir(String path) {			
+	public static File[] getGemsDir(String path) {
 		if (path.startsWith("$")) {
 			path = System.getenv(path.substring(1));
 		}
@@ -86,14 +90,14 @@ public class Util {
 	
 	private static FilenameFilter rakeFilter = new FilenameFilter() {
 		private final Pattern rakePattern = Pattern.compile("rake\\-([\\d.]+).gemspec");
-		public boolean accept(File path, String file) {			
+		public boolean accept(File path, String file) {
 			return rakePattern.matcher(file).matches();
 		}
 	};
 	
 	private static FilenameFilter gemDirFilter = new FilenameFilter() {
 	    Pattern gemVersionPattern = Pattern.compile("\\d+.\\d+(?:.\\d+)?");
-	    public boolean accept(File path, String file) {			
+	    public boolean accept(File path, String file) {
 			return gemVersionPattern.matcher(file).matches();
 		}
 	};
@@ -117,7 +121,7 @@ public class Util {
 							parent = parent.getParentFile();
 							gemsDir = getGemsDir(parent.getAbsolutePath());
 						}
-						 
+						
 						if (gemsDir != null && isRakeInstalled(gemsDir)) {
 							rubyVersions.add(parent);
 						}
@@ -125,7 +129,7 @@ public class Util {
 				}
 			}
 		}
-				
+		
 		return rubyVersions;
 	}
 	
@@ -145,7 +149,7 @@ out:	    for (File ruby : rubies) {
 					
 			return currentList.toArray(new RubyInstallation[currentList.size()]);
 		} catch (IOException e) {
-			hudson.Util.displayIOException(e, null);    
+			hudson.Util.displayIOException(e, null);
 		}
 		return new RubyInstallation[0];
 	}
@@ -158,7 +162,7 @@ out:	    for (File ruby : rubies) {
 				}
 			}
 		} catch (IOException e) {
-			hudson.Util.displayIOException(e, null);    
+			hudson.Util.displayIOException(e, null);
 		}
 		return false;
 	}
