@@ -10,9 +10,11 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
+import hudson.model.Node;
 import hudson.tasks.Builder;
 import hudson.util.ArgumentListBuilder;
 import hudson.util.FormValidation;
@@ -62,11 +64,24 @@ public class Rake extends Builder {
 		return null;
 	}
 
+    private Launcher getLastBuiltLauncher(AbstractBuild build, Launcher launcher, BuildListener listener) {
+        AbstractProject project = build.getProject();
+        Node lastBuiltOn = project.getLastBuiltOn();
+        Launcher lastBuiltLauncher = launcher;
+        if (lastBuiltOn != null) {
+            lastBuiltLauncher = lastBuiltOn.createLauncher(listener);
+        }
+
+        return lastBuiltLauncher;
+    }
+
 	@Override
 	public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException {
         ArgumentListBuilder args = new ArgumentListBuilder();
         String normalizedTasks = tasks.replaceAll("[\t\r\n]+"," ");
                 
+        Launcher lastBuiltLauncher = getLastBuiltLauncher(build, launcher, listener);
+
         RubyInstallation rake = getRake();
         if (rake != null) {        	
         	File exec = rake.getExecutable();
@@ -76,7 +91,7 @@ public class Rake extends Builder {
             }
             args.add(exec.getPath());
         } else {
-        	args.add(launcher.isUnix()?"rake":"rake.bat");
+        	args.add(lastBuiltLauncher.isUnix()?"rake":"rake.bat");
         }        
         
         if (rakeFile != null && rakeFile.length() > 0) {
@@ -98,7 +113,7 @@ public class Rake extends Builder {
         args.addTokenized(normalizedTasks);
         
         try {
-            int r = launcher.launch().cmds(args).envs(build.getEnvironment(listener)).stdout(listener).pwd(workingDir).join();
+            int r = lastBuiltLauncher.launch().cmds(args).envs(build.getEnvironment(listener)).stdout(listener).pwd(workingDir).join();
             return r == 0;
         } catch (IOException e) {
             Util.displayIOException(e,listener);
