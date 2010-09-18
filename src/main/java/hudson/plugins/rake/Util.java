@@ -103,8 +103,13 @@ public class Util {
     };
 
     public static Collection<File> getRubyInstallations() throws IOException {
-        String systemPath = System.getenv("PATH");
+        String systemPath = System.getenv("PATH");        
         if (systemPath == null) systemPath = System.getenv("path");
+        
+        return getRubyInstallations(systemPath);
+    }
+    
+    protected static Collection<File> getRubyInstallations(String systemPath) throws IOException {    	
         Collection<File> rubyVersions = new LinkedHashSet<File>();
 
         if (systemPath != null) {
@@ -129,16 +134,27 @@ public class Util {
                 }
             }
         }
-
+        
         return rubyVersions;
     }
 
     public static RubyInstallation[] getCanonicalRubies(RubyInstallation[] currentInstallations) {
-        try {
-            Collection<File> rubies = getRubyInstallations();
+    	try {
+    		Collection<File> rubies = getRubyInstallations();
+    		
+    		return getCanonicalRubies(currentInstallations, rubies);
+    	} catch (IOException e) {
+            hudson.Util.displayIOException(e, null);
+        }
+    	
+        return new RubyInstallation[0];
+    }
+    
+    protected static RubyInstallation[] getCanonicalRubies(RubyInstallation[] currentInstallations, Collection<File> candidates) {
+    	try {            
             Collection<RubyInstallation> currentList = new LinkedHashSet<RubyInstallation>(Arrays.asList(currentInstallations));
 
-out:        for (File ruby : rubies) {
+out:        for (File ruby : candidates) {
                 for (RubyInstallation current : currentList) {
                     if (current.getCanonicalExecutable().equals(getExecutable(ruby.getCanonicalPath()).getCanonicalFile())) {
                         continue out;
@@ -151,9 +167,10 @@ out:        for (File ruby : rubies) {
         } catch (IOException e) {
             hudson.Util.displayIOException(e, null);
         }
+        
         return new RubyInstallation[0];
     }
-
+ 
     public static boolean isAlreadyInstalled(RubyInstallation[] current, String path) {
         try {
             for (RubyInstallation ruby : current) {

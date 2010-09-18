@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.mockito.Mockito;
+
 import junit.framework.TestCase;
 /**
  *
@@ -34,10 +36,10 @@ public class TestUtil extends TestCase {
     }
 
     public void testDetectRubyInstallations() throws Exception {
-        if (execTest()) {
+        if (execTest()) {        	
             int expected = System.getenv("JRUBY_HOME") != null
                 && System.getenv("PATH").contains(System.getenv("JRUBY_HOME"))?2:1;
-            assertEquals(expected, Util.getRubyInstallations().size());
+            assertEquals(expected, Util.getRubyInstallations("/usr/bin").size());
         }
     }
 
@@ -65,13 +67,17 @@ public class TestUtil extends TestCase {
                 rubies.add(jruby);
             }
 
-            assertEquals(rubies.size(), Util.getCanonicalRubies(rubies.toArray(new RubyInstallation[rubies.size()])).length);
+            RubyInstallation[] currentInstalled = rubies.toArray(new RubyInstallation[rubies.size()]);
+            Collection<File> candidates = Util.getRubyInstallations("/usr/bin");
+            
+            assertEquals(rubies.size(), Util.getCanonicalRubies(currentInstalled, candidates).length);
         }
     }
 
     private boolean execTest() {
-                if(Boolean.getBoolean("rake.test.skip"))
-                    return false;
-                return new File("/usr/lib/ruby").exists();
+    	if(Boolean.getBoolean("rake.test.skip"))                	
+    		return false;
+                
+        return new File("/usr/lib/ruby").exists();
     }
 }
