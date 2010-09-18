@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.mockito.Mockito;
-
 import junit.framework.TestCase;
 /**
  *
