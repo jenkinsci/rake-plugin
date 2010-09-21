@@ -118,18 +118,20 @@ public class Rake extends Builder {
         args.addTokenized(normalizedTasks);
 
         try {
-        	EnvVars env = build.getEnvironment(listener);
-        	if (rake.getGemHome() != null) {
-        		env.put("GEM_HOME", rake.getGemHome());
-        	}
-        	if (rake.getGemPath() != null) {
-        		env.put("GEM_PATH", rake.getGemPath());
-        	}
-        	
+            EnvVars env = build.getEnvironment(listener);
+            if (rake != null) {
+                if (rake.getGemHome() != null) {
+                    env.put("GEM_HOME", rake.getGemHome());
+                }
+                if (rake.getGemPath() != null) {
+                    env.put("GEM_PATH", rake.getGemPath());
+                }
+            }
+
             int r = lastBuiltLauncher.launch().cmds(args)
-            	.envs(env)
-            	.stdout(listener)
-            	.pwd(workingDir).join();
+                .envs(env)
+                .stdout(listener)
+                .pwd(workingDir).join();
             return r == 0;
         } catch (IOException e) {
             Util.displayIOException(e,listener);
@@ -171,7 +173,7 @@ public class Rake extends Builder {
 
         @CopyOnWrite
         private volatile RubyInstallation[] installations = new RubyInstallation[0];
-        
+
         @CopyOnWrite
         private volatile Rvm rvm;
 
@@ -183,7 +185,7 @@ public class Rake extends Builder {
         @Override
         public synchronized void load() {
             super.load();
-            
+
             installations = getCanonicalRubies(installations);
             installations = getGlobalRubies(rvm, installations);
         }
@@ -193,7 +195,7 @@ public class Rake extends Builder {
         }
 
         @Override
-        public Rake newInstance(StaplerRequest req, JSONObject formData) throws FormException {        	
+        public Rake newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             return (Rake) req.bindJSON(clazz, formData);
         }
 
@@ -206,16 +208,16 @@ public class Rake extends Builder {
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             installations = req.bindParametersToList(RubyInstallation.class, "rake.")
                 .toArray(new RubyInstallation[0]);
-            
+
             rvm = req.bindParameters(Rvm.class, "rvm.");
             installations = getGlobalRubies(rvm, installations);
-            
+
             save();
             return true;
         }
-        
+
         public Rvm getRvm() {
-        	return rvm;
+            return rvm;
         }
 
         public RubyInstallation[] getInstallations() {
@@ -230,7 +232,7 @@ public class Rake extends Builder {
             }
 
             if (!hasGemsInstalled(f.getAbsolutePath())) {
-               	return FormValidation.error("It seems that ruby gems is not installed");
+                   return FormValidation.error("It seems that ruby gems is not installed");
             }
 
             if (!isRakeInstalled(getGemsDir(f.getAbsolutePath()))) {
@@ -239,21 +241,21 @@ public class Rake extends Builder {
 
             return FormValidation.ok();
         }
-        
+
         private RubyInstallation[] getGlobalRubies(Rvm rvm, RubyInstallation[] installations) {
-        	if (rvm == null || StringUtils.isEmpty(rvm.getPath())) {
-        		System.err.println(rvm);
-            	rvm = RvmUtil.getDefaultRvm();
+            if (rvm == null || StringUtils.isEmpty(rvm.getPath())) {
+                System.err.println(rvm);
+                rvm = RvmUtil.getDefaultRvm();
             }
-        	
-        	if (rvm != null) {
-	            RubyInstallation[] rvmInstallations = RvmUtil.getRvmRubies(rvm);
-	            Collection<RubyInstallation> tmp = new LinkedHashSet<RubyInstallation>(Arrays.asList(installations));
-	            tmp.addAll(Arrays.asList(rvmInstallations));
-	            
-	            installations = tmp.toArray(new RubyInstallation[tmp.size()]);
-        	}
-        	
+
+            if (rvm != null) {
+                RubyInstallation[] rvmInstallations = RvmUtil.getRvmRubies(rvm);
+                Collection<RubyInstallation> tmp = new LinkedHashSet<RubyInstallation>(Arrays.asList(installations));
+                tmp.addAll(Arrays.asList(rvmInstallations));
+
+                installations = tmp.toArray(new RubyInstallation[tmp.size()]);
+            }
+
             return installations;
         }
 
