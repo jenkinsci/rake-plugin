@@ -19,18 +19,25 @@ public class Util {
     private static final String[] RUBY_EXECUTABLES = {"ruby", "jruby"};
 
     public static File getExecutable(String path) {
-      String execName = isWindows()?"rake.bat":"rake";
-      File parent = isJruby(path) || isCustom(path, execName)? new File(path) : new File(path).getParentFile().getParentFile();
-      return new File(parent, "bin/" + execName);
-  }
+        File parent = isJruby(path) || isCustom(path, execName())? new File(path) : new File(path).getParentFile().getParentFile();
+        return new File(parent, "bin/" + execName());
+    }
+
+    public static File getExecutable(String path, String gemHome) {
+        return new File(gemHome, "bin/" + execName());
+    }
+
+    public static String execName() {
+        return isWindows() ? "rake.bat" : "rake";
+    }
 
     public static boolean isWindows() {
-          String name = System.getProperty("os.name");
-          return name != null?name.contains("Windows") : File.separatorChar == '\\';
+        String name = System.getProperty("os.name");
+        return name != null?name.contains("Windows") : File.separatorChar == '\\';
     }
 
     public static boolean isLinux() {
-          return System.getProperty("os.name").endsWith("Linux");
+        return System.getProperty("os.name").endsWith("Linux");
     }
 
     public static boolean isMac() {
@@ -38,13 +45,13 @@ public class Util {
     }
 
     public static boolean isJruby(String path) {
-          String execName = isWindows()?"jruby.bat":"jruby";
-          return new File(path, "bin/" + execName).exists();
+        String execName = isWindows()?"jruby.bat":"jruby";
+        return new File(path, "bin/" + execName).exists();
     }
 
-  public static boolean isCustom(String path, String execName) {
-      return new File(path, "bin/" + execName).exists();
-  }
+    public static boolean isCustom(String path, String execName) {
+        return new File(path, "bin/" + execName).exists();
+    }
 
     public static boolean hasGemsInstalled(String path) {
         File[] gems = getGemsDir(path);
@@ -103,13 +110,13 @@ public class Util {
     };
 
     public static Collection<File> getRubyInstallations() throws IOException {
-        String systemPath = System.getenv("PATH");        
+        String systemPath = System.getenv("PATH");
         if (systemPath == null) systemPath = System.getenv("path");
-        
+
         return getRubyInstallations(systemPath);
     }
-    
-    protected static Collection<File> getRubyInstallations(String systemPath) throws IOException {    	
+
+    protected static Collection<File> getRubyInstallations(String systemPath) throws IOException {
         Collection<File> rubyVersions = new LinkedHashSet<File>();
 
         if (systemPath != null) {
@@ -134,24 +141,24 @@ public class Util {
                 }
             }
         }
-        
+
         return rubyVersions;
     }
 
     public static RubyInstallation[] getCanonicalRubies(RubyInstallation[] currentInstallations) {
-    	try {
-    		Collection<File> rubies = getRubyInstallations();
-    		
-    		return getCanonicalRubies(currentInstallations, rubies);
-    	} catch (IOException e) {
+      try {
+        Collection<File> rubies = getRubyInstallations();
+
+        return getCanonicalRubies(currentInstallations, rubies);
+      } catch (IOException e) {
             hudson.Util.displayIOException(e, null);
         }
-    	
+
         return new RubyInstallation[0];
     }
-    
+
     protected static RubyInstallation[] getCanonicalRubies(RubyInstallation[] currentInstallations, Collection<File> candidates) {
-    	try {            
+      try {
             Collection<RubyInstallation> currentList = new LinkedHashSet<RubyInstallation>(Arrays.asList(currentInstallations));
 
 out:        for (File ruby : candidates) {
@@ -167,10 +174,10 @@ out:        for (File ruby : candidates) {
         } catch (IOException e) {
             hudson.Util.displayIOException(e, null);
         }
-        
+
         return new RubyInstallation[0];
     }
- 
+
     public static boolean isAlreadyInstalled(RubyInstallation[] current, String path) {
         try {
             for (RubyInstallation ruby : current) {

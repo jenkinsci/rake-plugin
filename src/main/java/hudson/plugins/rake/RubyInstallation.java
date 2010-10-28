@@ -48,7 +48,8 @@ public final class RubyInstallation {
     }
 
     public File getExecutable() {
-        return Util.getExecutable(getPath());
+        return getGemHome() != null ? Util.getExecutable(getPath(), getGemHome()) :
+          Util.getExecutable(getPath());
     }
 
     public File getCanonicalExecutable() throws IOException {
@@ -59,6 +60,7 @@ public final class RubyInstallation {
         return "\nN " + getName() +
             "\n P " + getPath() +
             "\n GH " + getGemHome() +
-            "\n GP " + getGemPath();
+            "\n GP " + getGemPath() +
+            "\n EXEC " + getExecutable();
     }
 }
