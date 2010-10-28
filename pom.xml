@@ -7,7 +7,7 @@
   </parent>
 
   <artifactId>rake</artifactId>
-  <version>1.7.2</version>
+  <version>1.7.3-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <name>Hudson Rake plugin</name>
   <url>http://wiki.hudson-ci.org/display/HUDSON/Rake+Plugin</url>
