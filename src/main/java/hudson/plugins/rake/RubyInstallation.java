@@ -13,7 +13,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 public final class RubyInstallation {
     private final String name;
     private final String path;
-    
+
     private String gemHome;
     private String gemPath;
 
@@ -32,33 +32,33 @@ public final class RubyInstallation {
     }
 
     public String getGemHome() {
-		return gemHome;
-	}
+        return gemHome;
+    }
 
-	public void setGemHome(String gemHome) {
-		this.gemHome = gemHome;
-	}
+    public void setGemHome(String gemHome) {
+        this.gemHome = gemHome;
+    }
 
-	public String getGemPath() {
-		return gemPath;
-	}
+    public String getGemPath() {
+        return gemPath;
+    }
 
-	public void setGemPath(String gemPath) {
-		this.gemPath = gemPath;
-	}
+    public void setGemPath(String gemPath) {
+        this.gemPath = gemPath;
+    }
 
-	public File getExecutable() {
+    public File getExecutable() {
         return Util.getExecutable(getPath());
     }
 
     public File getCanonicalExecutable() throws IOException {
         return Util.getExecutable(getPath()).getCanonicalFile();
     }
-    
+
     public String toString() {
-    	return "\nN " + getName() +
-    		"\n P " + getPath() +
-    		"\n GH " + getGemHome() +
-    		"\n GP " + getGemPath();
+        return "\nN " + getName() +
+            "\n P " + getPath() +
+            "\n GH " + getGemHome() +
+            "\n GP " + getGemPath();
     }
 }
