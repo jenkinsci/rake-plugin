@@ -48,7 +48,7 @@ public final class RubyInstallation {
     }
 
     public File getExecutable() {
-        return getGemHome() != null ? Util.getExecutable(getPath(), getGemHome()) :
+        return getGemHome() != null ? Util.getExecutable(getPath(), getGemHome(), getGemPath()) :
           Util.getExecutable(getPath());
     }
 

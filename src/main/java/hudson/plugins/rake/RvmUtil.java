@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.regex.Pattern;
 
 class RvmUtil {
@@ -40,9 +41,11 @@ class RvmUtil {
                     RvmFilenameFilter filter = new RvmFilenameFilter(name);
                     Collection<FilePath> gems = gemsPath.list(filter);
 
+                    FilePath global = getGlobal(name, gemsPath);
+
                     for (FilePath gemCandidate : gems) {
-                        FilePath specifications = gemCandidate.child("specifications");
-                        if (specifications.exists()) {
+                        FilePath specifications = getSpecifications(gemCandidate, global);
+                        if (specifications != null) {
                             Collection<FilePath> specs = specifications.list(rakeFilter);
 
                             if (specs != null && specs.size() > 0) {
@@ -50,7 +53,7 @@ class RvmUtil {
                                         new File(candidate.toURI()).getCanonicalPath());
 
                                 ruby.setGemHome(new File(gemCandidate.toURI()).getCanonicalPath());
-                                ruby.setGemPath(buildGemPath(ruby.getGemHome(), gems));
+                                ruby.setGemPath(buildGemPath(ruby.getGemHome(), global, gems));
 
                                 rubies.add(ruby);
                             }
@@ -68,18 +71,54 @@ class RvmUtil {
         return rubies.toArray(new RubyInstallation[rubies.size()]);
     }
 
-    private static String buildGemPath(String currentGem, Collection<FilePath> candidateGems)
+    private static String buildGemPath(String currentGem, FilePath global, Collection<FilePath> candidateGems)
             throws InterruptedException, IOException {
-        StringBuilder path = new StringBuilder(currentGem);
+        StringBuilder path = new StringBuilder();
+
+        Collection<String> paths = new LinkedHashSet<String>();
+        paths.add(currentGem);
 
         for (FilePath gem : candidateGems) {
             File gemFile = new File(gem.toURI());
-            if ((gemFile.getCanonicalPath().startsWith(currentGem + "@") && gem.child("specifications").exists())) {
-                path.append(File.pathSeparator).append(gemFile.getCanonicalPath());
+            String canonicalPath = gemFile.getCanonicalPath();
+            if ((canonicalPath.startsWith(currentGem + "@") && gem.child("specifications").exists())) {
+                paths.add(canonicalPath);
             }
         }
 
+        if (global != null && global.child("specifications").exists()) {
+            File globalFile = new File(global.toURI());
+            paths.add(globalFile.getCanonicalPath());
+        }
+
+        for (String canonical : paths) {
+            path.append(File.pathSeparator).append(canonical);
+        }
+
         return path.toString();
+    }
+
+    private static FilePath getGlobal(String name, FilePath gemsPath)
+            throws InterruptedException, IOException {
+        RvmGlobalFilter globalFilter = new RvmGlobalFilter(name);
+        List<FilePath> globalGems = gemsPath.list(globalFilter);
+        FilePath global = null;
+        if (!globalGems.isEmpty()) {
+            global = globalGems.get(0);
+        }
+        return global;
+    }
+
+    private static FilePath getSpecifications(FilePath candidate, FilePath global)
+            throws InterruptedException, IOException {
+        FilePath specification = candidate.child("specifications");
+        if (specification.exists()) {
+            return specification;
+        } else if (global != null && global.exists() &&
+                global.child("specifications").exists()) {
+            return global.child("specifications");
+        }
+        return null;
     }
 
     private static class RvmFilenameFilter implements FileFilter, Serializable {
@@ -92,6 +131,19 @@ class RvmUtil {
         public boolean accept(File pathname) {
             return pathname.getName().startsWith(this.name)
                 && !pathname.getName().endsWith("@");
+        }
+    }
+
+    private static class RvmGlobalFilter implements FileFilter, Serializable {
+        private final String name;
+
+        public RvmGlobalFilter(String name) {
+            this.name = name;
+        }
+
+        public boolean accept(File pathname) {
+            return pathname.getName().startsWith(this.name)
+                && pathname.getName().endsWith("@global");
         }
     }
 

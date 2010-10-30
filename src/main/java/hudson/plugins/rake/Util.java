@@ -23,7 +23,13 @@ public class Util {
         return new File(parent, "bin/" + execName());
     }
 
-    public static File getExecutable(String path, String gemHome) {
+    public static File getExecutable(String path, String gemHome, String gemPath) {
+        for (String candidate : gemPath.split(File.pathSeparator)) {
+            File bin = new File(candidate, "bin/" + execName());
+            if (bin.exists()) {
+                return bin;
+            }
+        }
         return new File(gemHome, "bin/" + execName());
     }
 
