@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.jvnet.hudson.plugins</groupId>
+    <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.376</version>
+    <version>1.397</version>
   </parent>
 
   <artifactId>rake</artifactId>
@@ -21,9 +21,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/hudson/rake-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:hudson/rake-plugin.git</developerConnection>
-    <url>http://github.com/hudson/rake-plugin</url>
+    <connection>scm:git:git://github.com/jenkins/rake-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:jenkins/rake-plugin.git</developerConnection>
+    <url>http://github.com/jenkins/rake-plugin</url>
   </scm>
   
   <build>
@@ -49,4 +49,19 @@
       </plugin>
     </plugins>
   </build>
+
+  <distributionManagement>
+    <repository>
+      <id>maven.jenkins-ci.org</id>
+      <url>http://maven.jenkins-ci.org:8081/content/repositories/releases/</url>
+    </repository>
+  </distributionManagement>
+
+  <repositories>
+    <repository>
+      <id>maven.jenkins-ci.org</id>
+      <url>http://maven.jenkins-ci.org:8081/content/repositories/releases/</url>
+    </repository>
+  </repositories>
+
 </project>
