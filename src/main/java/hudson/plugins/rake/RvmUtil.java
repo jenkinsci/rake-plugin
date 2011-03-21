@@ -49,11 +49,12 @@ class RvmUtil {
                             Collection<FilePath> specs = specifications.list(rakeFilter);
 
                             if (specs != null && specs.size() > 0) {
-                                RubyInstallation ruby = new RubyInstallation(gemCandidate.getName(),
-                                        new File(candidate.toURI()).getCanonicalPath());
+                                String path = new File(candidate.toURI()).getCanonicalPath();
+                                RubyInstallation ruby = new RubyInstallation(gemCandidate.getName(), path);
 
                                 ruby.setGemHome(new File(gemCandidate.toURI()).getCanonicalPath());
                                 ruby.setGemPath(buildGemPath(ruby.getGemHome(), global, gems));
+                                ruby.setBinPath(new File(path, "bin").getCanonicalPath());
 
                                 rubies.add(ruby);
                             }

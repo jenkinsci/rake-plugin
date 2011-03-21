@@ -126,6 +126,16 @@ public class Rake extends Builder {
                 if (rake.getGemPath() != null) {
                     env.put("GEM_PATH", rake.getGemPath());
                 }
+                if (rake.getBinPath() != null) {
+                    StringBuilder builder = new StringBuilder();
+                    String path = env.get("PATH");
+                    if (path != null) {
+                        builder.append(File.pathSeparator);
+                    }
+
+                    builder.append(rake.getBinPath());
+                    env.put("PATH", builder.toString());
+                }
             }
 
             int r = lastBuiltLauncher.launch().cmds(args)

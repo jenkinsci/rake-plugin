@@ -16,6 +16,7 @@ public final class RubyInstallation {
 
     private String gemHome;
     private String gemPath;
+    private String binPath;
 
     @DataBoundConstructor
     public RubyInstallation(String name, String path) {
@@ -45,6 +46,14 @@ public final class RubyInstallation {
 
     public void setGemPath(String gemPath) {
         this.gemPath = gemPath;
+    }
+
+    public String getBinPath() {
+        return binPath;
+    }
+
+    public void setBinPath(String binPath) {
+        this.binPath = binPath;
     }
 
     public File getExecutable() {
