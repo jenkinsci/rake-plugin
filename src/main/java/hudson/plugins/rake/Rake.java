@@ -130,7 +130,7 @@ public class Rake extends Builder {
                     StringBuilder builder = new StringBuilder();
                     String path = env.get("PATH");
                     if (path != null) {
-                        builder.append(File.pathSeparator);
+                        builder.append(path).append(File.pathSeparator);
                     }
 
                     builder.append(rake.getBinPath());
