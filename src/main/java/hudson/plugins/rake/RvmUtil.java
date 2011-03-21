@@ -54,7 +54,7 @@ class RvmUtil {
 
                                 ruby.setGemHome(new File(gemCandidate.toURI()).getCanonicalPath());
                                 ruby.setGemPath(buildGemPath(ruby.getGemHome(), global, gems));
-                                ruby.setBinPath(new File(path, "bin").getCanonicalPath());
+                                ruby.setBinPath(new File(ruby.getGemHome(), "bin").getCanonicalPath());
 
                                 rubies.add(ruby);
                             }
