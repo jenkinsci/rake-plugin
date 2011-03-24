@@ -70,14 +70,19 @@ class RvmUtil {
                         ruby.setGemHome(new File(gemCandidate.toURI()).getCanonicalPath());
                         ruby.setGemPath(buildGemPath(ruby.getGemHome(), global, gems));
 
+                        // Add RVM Ruby path
                         if (newpath.length() > 0) {
                             newpath = newpath.concat(File.pathSeparator);
                         }
-                        newpath = newpath.concat(new File(ruby.getGemHome(), "bin").getCanonicalPath());
+                        newpath = newpath.concat(rubiesPath.getRemote() + File.separator + name + File.separator + "bin");
+
+                        // Add GEM bin directory to path
+                        newpath = newpath.concat(File.pathSeparator).concat(new File(ruby.getGemHome(), "bin").getCanonicalPath());
+
+                        // Create or append the calculated path for this Ruby install
                         path = ruby.getBinPath();
                         if (path == null || path.length() == 0) {
-                            path = new String();
-                            path = path.concat(newpath);
+                            path = newpath;
                         } else {
                             path = path.concat(File.pathSeparator).concat(newpath);
                         }
