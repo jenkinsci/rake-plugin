@@ -44,21 +44,39 @@ class RvmUtil {
                     FilePath global = getGlobal(name, gemsPath);
 
                     for (FilePath gemCandidate : gems) {
-                        FilePath specifications = getSpecifications(gemCandidate, global);
+                        FilePath specifications = getSpecifications(gemCandidate);
                         if (specifications != null) {
                             Collection<FilePath> specs = specifications.list(rakeFilter);
-
-                            if (specs != null && specs.size() > 0) {
-                                String path = new File(candidate.toURI()).getCanonicalPath();
-                                RubyInstallation ruby = new RubyInstallation(gemCandidate.getName(), path);
-
-                                ruby.setGemHome(new File(gemCandidate.toURI()).getCanonicalPath());
-                                ruby.setGemPath(buildGemPath(ruby.getGemHome(), global, gems));
-                                ruby.setBinPath(new File(ruby.getGemHome(), "bin").getCanonicalPath());
-
-                                rubies.add(ruby);
+                            if (specs == null || specs.size() == 0) {
+                                // We did not find the rake gem in this gemset's bin directory; check in global
+                                specifications = getSpecifications(global);
+                                if (specifications != null) {
+                                    specs = specifications.list(rakeFilter);
+                                    if (specs == null || specs.size() == 0) {
+                                        // Rake not found in global either; this gemset is unusable
+                                        continue;
+                                    }
+                                }
                             }
                         }
+
+                        String path = new File(candidate.toURI()).getCanonicalPath();
+                        RubyInstallation ruby = new RubyInstallation(gemCandidate.getName(), path);
+
+                        ruby.setGemHome(new File(gemCandidate.toURI()).getCanonicalPath());
+                        ruby.setGemPath(buildGemPath(ruby.getGemHome(), global, gems));
+
+                        String newpath = new File(ruby.getGemHome(), "bin").getCanonicalPath();
+                        path = ruby.getBinPath();
+                        if (path == null || path.length() == 0) {
+                            path = new String();
+                            path.concat(newpath);
+                        } else {
+                            path.concat(File.pathSeparator).concat(newpath);
+                        }
+                        ruby.setBinPath(path);
+
+                        rubies.add(ruby);
                     }
 
                 }
@@ -110,14 +128,12 @@ class RvmUtil {
         return global;
     }
 
-    private static FilePath getSpecifications(FilePath candidate, FilePath global)
+    private static FilePath getSpecifications(FilePath candidate)
             throws InterruptedException, IOException {
         FilePath specification = candidate.child("specifications");
+System.err.println("Candidate: " + candidate);
         if (specification.exists()) {
             return specification;
-        } else if (global != null && global.exists() &&
-                global.child("specifications").exists()) {
-            return global.child("specifications");
         }
         return null;
     }
