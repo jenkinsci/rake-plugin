@@ -79,14 +79,7 @@ class RvmUtil {
                         // Add GEM bin directory to path
                         newpath = newpath.concat(File.pathSeparator).concat(new File(ruby.getGemHome(), "bin").getCanonicalPath());
 
-                        // Create or append the calculated path for this Ruby install
-                        path = ruby.getBinPath();
-                        if (path == null || path.length() == 0) {
-                            path = newpath;
-                        } else {
-                            path = path.concat(File.pathSeparator).concat(newpath);
-                        }
-                        ruby.setBinPath(path);
+                        ruby.setBinPath(newpath);
 
                         rubies.add(ruby);
                     }

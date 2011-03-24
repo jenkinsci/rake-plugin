@@ -120,15 +120,12 @@ public class Rake extends Builder {
         try {
             EnvVars env = build.getEnvironment(listener);
             if (rake != null) {
-                System.out.println("Rake GEM HOME: "+ rake.getGemHome());
                 if (rake.getGemHome() != null) {
                     env.put("GEM_HOME", rake.getGemHome());
                 }
-                System.out.println("Rake GEM PATH: "+ rake.getGemPath());
                 if (rake.getGemPath() != null) {
                     env.put("GEM_PATH", rake.getGemPath());
                 }
-                System.err.println("Rake Bin PATH: "+ rake.getBinPath());
                 if (rake.getBinPath() != null) {
                     StringBuilder builder = new StringBuilder();
                     String path = env.get("PATH");
