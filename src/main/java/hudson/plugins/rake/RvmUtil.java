@@ -44,6 +44,7 @@ class RvmUtil {
                     FilePath global = getGlobal(name, gemsPath);
 
                     for (FilePath gemCandidate : gems) {
+                        String newpath = "";
                         FilePath specifications = getSpecifications(gemCandidate);
                         if (specifications != null) {
                             Collection<FilePath> specs = specifications.list(rakeFilter);
@@ -55,6 +56,9 @@ class RvmUtil {
                                     if (specs == null || specs.size() == 0) {
                                         // Rake not found in global either; this gemset is unusable
                                         continue;
+                                    } else {
+                                        // Rake was found in the global gemset; include it in the path
+                                        newpath = global.getRemote().concat(File.separator).concat("bin");
                                     }
                                 }
                             }
@@ -66,13 +70,16 @@ class RvmUtil {
                         ruby.setGemHome(new File(gemCandidate.toURI()).getCanonicalPath());
                         ruby.setGemPath(buildGemPath(ruby.getGemHome(), global, gems));
 
-                        String newpath = new File(ruby.getGemHome(), "bin").getCanonicalPath();
+                        if (newpath.length() > 0) {
+                            newpath = newpath.concat(File.pathSeparator);
+                        }
+                        newpath = newpath.concat(new File(ruby.getGemHome(), "bin").getCanonicalPath());
                         path = ruby.getBinPath();
                         if (path == null || path.length() == 0) {
                             path = new String();
-                            path.concat(newpath);
+                            path = path.concat(newpath);
                         } else {
-                            path.concat(File.pathSeparator).concat(newpath);
+                            path = path.concat(File.pathSeparator).concat(newpath);
                         }
                         ruby.setBinPath(path);
 
@@ -111,9 +118,11 @@ class RvmUtil {
         }
 
         for (String canonical : paths) {
-            path.append(File.pathSeparator).append(canonical);
+            if (path.length() > 0) {
+                path.append(File.pathSeparator);
+            }
+            path.append(canonical);
         }
-
         return path.toString();
     }
 
@@ -131,7 +140,6 @@ class RvmUtil {
     private static FilePath getSpecifications(FilePath candidate)
             throws InterruptedException, IOException {
         FilePath specification = candidate.child("specifications");
-System.err.println("Candidate: " + candidate);
         if (specification.exists()) {
             return specification;
         }
