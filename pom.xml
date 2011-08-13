@@ -7,7 +7,7 @@
   </parent>
 
   <artifactId>rake</artifactId>
-  <version>1.7.7-SNAPSHOT</version>
+  <version>1.7.7</version>
   <packaging>hpi</packaging>
   <name>Jenkins Rake plugin</name>
   <url>http://wiki.jenkins-ci.org/display/JENKINS/Rake+Plugin</url>
