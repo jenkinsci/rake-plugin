@@ -128,12 +128,13 @@ public class Rake extends Builder {
                 }
                 if (rake.getBinPath() != null) {
                     StringBuilder builder = new StringBuilder();
+                    builder.append(rake.getBinPath());
+
                     String path = env.get("PATH");
                     if (path != null) {
-                        builder.append(path).append(File.pathSeparator);
+                        builder.append(File.pathSeparator).append(path);
                     }
 
-                    builder.append(rake.getBinPath());
                     env.put("PATH", builder.toString());
                 }
             }
