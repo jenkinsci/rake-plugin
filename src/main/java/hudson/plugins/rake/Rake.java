@@ -85,7 +85,22 @@ public class Rake extends Builder {
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException {
         ArgumentListBuilder args = new ArgumentListBuilder();
-	        String normalizedTasks = TokenMacro.expand(build, listener, tasks.replaceAll("[    \r\n]+"," "));
+	        String normalizedTasks = "";
+	
+		try {
+			String env = build.getEnvironment(listener).expand(tasks);
+			env = Util.replaceMacro(env, build.getBuildVariableResolver());
+			String tokenized = TokenMacro.expand(build, listener, env);
+			normalizedTasks = tokenized.replaceAll("[    \r\n]+"," ");
+		}
+		catch (MacroEvaluationException mee) {
+			System.err.println("MacroEvaluationException: " + mee.getMessage());
+			normalizedTasks = tasks.replaceAll("[    \r\n]+"," ");
+		}
+		catch (IOException ioe){
+			normalizedTasks = tasks.replaceAll("[    \r\n]+"," ");
+			
+		}
 
         Launcher lastBuiltLauncher = getLastBuiltLauncher(build, launcher, listener);
 
