@@ -127,11 +127,12 @@ public class Util {
      * PATHEXT to {@link executable} when searching the PATH.
      * @param executable The full name of the program to find in the {@link path}.
      * @param path The value of the PATH environment variable.
+     * @param pathSeparator The path separation character for the agent's OS. 
      * @return The absolute path to the {@link executable} if it was found in the path;
      *         the original value of {@link executable} otherwise.  
      */
-    public static String findInPath(String executable, String path) {
-        final String[] parts = path.split(File.pathSeparator);
+    public static String findInPath(String executable, String path, String pathSeparator) {
+        final String[] parts = path.split(pathSeparator);
         for (String part : parts) {
             final File potentialExecutable = new File(part, executable);
             if (potentialExecutable.exists()) {

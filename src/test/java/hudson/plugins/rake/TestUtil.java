@@ -55,7 +55,7 @@ public class TestUtil extends TestCase {
             emptyFile.createNewFile();
             final String path = folderOne.getAbsolutePath() + File.pathSeparator + folderTwo.getAbsolutePath();
             
-            final String actual = Util.findInPath(emptyFile.getName(), path);
+            final String actual = Util.findInPath(emptyFile.getName(), path, File.pathSeparator);
             
             assertEquals(emptyFile.getAbsolutePath(), actual);
         }
