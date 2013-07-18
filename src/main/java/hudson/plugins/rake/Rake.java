@@ -88,6 +88,7 @@ public class Rake extends Builder {
 
         Launcher lastBuiltLauncher = getLastBuiltLauncher(build, launcher, listener);
 
+        final String pathSeparator = lastBuiltLauncher.isUnix()? ":" : ";";
         RubyInstallation rake = getRake();
         if (rake != null) {
             File exec = rake.getExecutable();
@@ -110,7 +111,6 @@ public class Rake extends Builder {
                 // no big deal; ignore and we'll skip the PATH scan below
             }
             if (path != null) {
-                final String pathSeparator = lastBuiltLauncher.isUnix()? ":" : ";";
                 executable = findInPath(executable, path, pathSeparator);
             }
             args.add(executable);
@@ -147,7 +147,7 @@ public class Rake extends Builder {
                     StringBuilder builder = new StringBuilder();
                     String path = env.get("PATH");
                     if (path != null) {
-                        builder.append(path).append(File.pathSeparator);
+                        builder.append(path).append(pathSeparator);
                     }
 
                     builder.append(rake.getBinPath());
