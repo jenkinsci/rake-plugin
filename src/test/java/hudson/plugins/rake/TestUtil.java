@@ -41,6 +41,37 @@ public class TestUtil extends TestCase {
         }
     }
 
+    public void testFindInPath() throws IOException {
+        String temp = System.getenv("TEMP");
+        if (temp == null || temp.length() == 0) {
+            temp = "/tmp";
+        }
+        final File folderOne = new File(temp, "testFindInPath-folderOne");
+        final File folderTwo = new File(temp, "testFindInPath-folderTwo");
+        final File emptyFile = new File(folderTwo, "testFindInPath-emptyFile.txt");
+        try {
+            folderOne.mkdir();
+            folderTwo.mkdir();
+            emptyFile.createNewFile();
+            final String path = folderOne.getAbsolutePath() + File.pathSeparator + folderTwo.getAbsolutePath();
+            
+            final String actual = Util.findInPath(emptyFile.getName(), path, File.pathSeparator);
+            
+            assertEquals(emptyFile.getAbsolutePath(), actual);
+        }
+        finally {
+            if (emptyFile.exists()) {
+                emptyFile.delete();
+            }
+            if (folderTwo.exists()) {
+                folderTwo.delete();
+            }
+            if (folderOne.exists()) {
+                folderOne.delete();
+            }
+        }
+    }
+    
     public void testGetCanonicalRubies() throws IOException {
         if (execTest() && System.getenv("JRUBY_HOME") != null) {
             File file = new File(System.getenv("JRUBY_HOME") + "/bin/jruby");
