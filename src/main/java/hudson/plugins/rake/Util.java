@@ -121,6 +121,26 @@ public class Util {
 
         return getRubyInstallations(systemPath);
     }
+    
+    /**
+     * Works kind of like the "which" program; the method won't try to apply
+     * PATHEXT to {@link executable} when searching the PATH.
+     * @param executable The full name of the program to find in the {@link path}.
+     * @param path The value of the PATH environment variable.
+     * @return The absolute path to the {@link executable} if it was found in the path;
+     *         the original value of {@link executable} otherwise.  
+     */
+    public static String findInPath(String executable, String path) {
+        final String[] parts = path.split(File.pathSeparator);
+        for (String part : parts) {
+            final File potentialExecutable = new File(part, executable);
+            if (potentialExecutable.exists()) {
+                executable = potentialExecutable.getAbsolutePath();
+                break;
+            }
+        }
+        return executable;
+    }
 
     protected static Collection<File> getRubyInstallations(String systemPath) throws IOException {
         Collection<File> rubyVersions = new LinkedHashSet<File>();
