@@ -1,5 +1,6 @@
 package hudson.plugins.rake;
 
+import static hudson.plugins.rake.Util.findInPath;
 import static hudson.plugins.rake.Util.getCanonicalRubies;
 import static hudson.plugins.rake.Util.getGemsDir;
 import static hudson.plugins.rake.Util.hasGemsInstalled;
@@ -87,6 +88,7 @@ public class Rake extends Builder {
 
         Launcher lastBuiltLauncher = getLastBuiltLauncher(build, launcher, listener);
 
+        final String pathSeparator = lastBuiltLauncher.isUnix()? ":" : ";";
         RubyInstallation rake = getRake();
         if (rake != null) {
             File exec = rake.getExecutable();
@@ -96,7 +98,22 @@ public class Rake extends Builder {
             }
             args.add(exec.getPath());
         } else {
-            args.add(lastBuiltLauncher.isUnix()?"rake":"rake.bat");
+            String executable = lastBuiltLauncher.isUnix()?"rake":"rake.bat";
+            // search PATH to build an absolute path to the executable,
+            // to work around a bug in Java 7u21 - 7u25
+            // "JDK-8016721 : (process) Behavior of %~dp0 in .cmd and .bat scripts has changed"
+            // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=8016721
+            String path = null;
+            try {
+                final EnvVars env = build.getEnvironment(listener);
+                path = env.get("PATH");
+            } catch (IOException e) {
+                // no big deal; ignore and we'll skip the PATH scan below
+            }
+            if (path != null) {
+                executable = findInPath(executable, path, pathSeparator);
+            }
+            args.add(executable);
         }
 
         if (rakeFile != null && rakeFile.length() > 0) {
@@ -130,7 +147,7 @@ public class Rake extends Builder {
                     StringBuilder builder = new StringBuilder();
                     String path = env.get("PATH");
                     if (path != null) {
-                        builder.append(path).append(File.pathSeparator);
+                        builder.append(path).append(pathSeparator);
                     }
 
                     builder.append(rake.getBinPath());
