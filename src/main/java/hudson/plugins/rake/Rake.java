@@ -215,6 +215,7 @@ public class Rake extends Builder {
 
             installations = getCanonicalRubies(installations);
             installations = getGlobalRubies(rvm, installations);
+            Arrays.sort(installations);
         }
 
         public String getDisplayName() {

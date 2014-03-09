@@ -10,7 +10,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @author David Calavera
  *
  */
-public final class RubyInstallation {
+public final class RubyInstallation implements Comparable<RubyInstallation> {
     private final String name;
     private final String path;
 
@@ -71,5 +71,11 @@ public final class RubyInstallation {
             "\n GH " + getGemHome() +
             "\n GP " + getGemPath() +
             "\n EXEC " + getExecutable();
+    }
+
+    @Override
+    public int compareTo(RubyInstallation other){
+        int last = this.name.compareTo(other.name);
+        return last == 0 ? this.name.compareTo(other.name) : last;
     }
 }
