@@ -74,8 +74,7 @@ public final class RubyInstallation implements Comparable<RubyInstallation> {
     }
 
     @Override
-    public int compareTo(RubyInstallation other){
-        int last = this.name.compareTo(other.name);
-        return last == 0 ? this.name.compareTo(other.name) : last;
+    public int compareTo(RubyInstallation other) {
+        return this.name.compareTo(other.name);
     }
 }
