@@ -90,6 +90,15 @@ public class Rake extends Builder {
 
         final String pathSeparator = lastBuiltLauncher.isUnix()? ":" : ";";
         RubyInstallation rake = getRake();
+
+        // If the ruby installation is not found, try to load the ruby installations again and
+        // check again. This enables the ability for gemsets to be recoginised which are created
+        // on the fly using the rvm plugin.
+        if (rake == null) {
+          getDescriptor().loadInstallations();
+          rake = getRake();
+        }
+
         if (rake != null) {
             File exec = rake.getExecutable();
             if(!exec.exists()) {
@@ -213,6 +222,10 @@ public class Rake extends Builder {
         public synchronized void load() {
             super.load();
 
+            loadInstallations();
+        }
+
+        public void loadInstallations() {
             installations = getCanonicalRubies(installations);
             installations = getGlobalRubies(rvm, installations);
         }
