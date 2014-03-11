@@ -7,7 +7,7 @@ import org.junit.Test;
 public class TestRubyInstallation {
 
     @Test
-    public void testCompareToRubyInstallationCompareTo() {
+    public void testCompareTo() {
         RubyInstallation inst1 = new RubyInstallation("a", "/usr/bin/a");
         RubyInstallation inst2 = new RubyInstallation("b", "/usr/bin/a");
 
