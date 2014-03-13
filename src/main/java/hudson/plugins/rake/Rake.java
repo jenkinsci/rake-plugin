@@ -50,15 +50,17 @@ public class Rake extends Builder {
     private final String rakeWorkingDir;
     private final String tasks;
     private final boolean silent;
+    private final boolean bundleExec;
 
     @DataBoundConstructor
-    public Rake(String rakeInstallation, String rakeFile, String tasks, String rakeLibDir, String rakeWorkingDir, boolean silent) {
+    public Rake(String rakeInstallation, String rakeFile, String tasks, String rakeLibDir, String rakeWorkingDir, boolean silent, boolean bundleExec) {
         this.rakeInstallation = rakeInstallation;
         this.rakeFile = rakeFile;
         this.tasks = tasks;
         this.rakeLibDir = rakeLibDir;
         this.rakeWorkingDir = rakeWorkingDir;
         this.silent = silent;
+        this.bundleExec = bundleExec;
     }
 
     private RubyInstallation getRake() {
@@ -91,14 +93,21 @@ public class Rake extends Builder {
         final String pathSeparator = lastBuiltLauncher.isUnix()? ":" : ";";
         RubyInstallation rake = getRake();
         if (rake != null) {
-            File exec = rake.getExecutable();
+            File exec;
+            if (bundleExec) {
+                exec = rake.getBundleExecutable();
+            } else {
+                exec = rake.getExecutable();
+            }
             if(!exec.exists()) {
                 listener.fatalError(exec + " doesn't exist");
                 return false;
             }
             args.add(exec.getPath());
         } else {
-            String executable = lastBuiltLauncher.isUnix()?"rake":"rake.bat";
+            String fileExtension = lastBuiltLauncher.isUnix()?"":".bat";
+            String executable = bundleExec?"bundle":"rake";
+            executable += fileExtension;
             // search PATH to build an absolute path to the executable,
             // to work around a bug in Java 7u21 - 7u25
             // "JDK-8016721 : (process) Behavior of %~dp0 in .cmd and .bat scripts has changed"
@@ -116,6 +125,9 @@ public class Rake extends Builder {
             args.add(executable);
         }
 
+        if (bundleExec) {
+            args.add("exec", "rake");
+        }
         if (rakeFile != null && rakeFile.length() > 0) {
             args.add("--rakefile", rakeFile);
         }
@@ -190,6 +202,10 @@ public class Rake extends Builder {
 
     public boolean isSilent() {
         return silent;
+    }
+
+    public boolean isBundleExec() {
+        return bundleExec;
     }
 
     public String getRakeWorkingDir() {

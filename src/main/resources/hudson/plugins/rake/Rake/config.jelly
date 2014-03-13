@@ -13,6 +13,9 @@
     <f:entry title="Tasks" description=" Specify Rake task(s) to run.">
     	<f:expandableTextbox name="rake.tasks" value="${instance.tasks}" />
   	</f:entry>
+    <f:entry title="bundle exec" description="If your project uses Bundler gem requirements manager, this option will allow you to launch rake tasks using 'bundle exec' command.">
+        <f:checkbox name="rake.bundleExec" checked="${instance.bundleExec}"/>
+    </f:entry>
   	<f:advanced>
   	    <f:entry title="Rake file" description="Specify the rake file path, by default it's './Rakefile'">
           <f:textbox name="rake.rakeFile" value="${instance.rakeFile}"/>
