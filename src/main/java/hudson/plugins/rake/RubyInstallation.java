@@ -61,6 +61,11 @@ public final class RubyInstallation implements Comparable<RubyInstallation> {
           Util.getExecutable(getPath());
     }
 
+    public File getBundleExecutable() {
+        return getGemHome() != null ? Util.getBundleExecutable(getPath(), getGemHome(), getGemPath()) :
+          Util.getBundleExecutable(getPath());
+    }
+
     public File getCanonicalExecutable() throws IOException {
         return Util.getExecutable(getPath()).getCanonicalFile();
     }

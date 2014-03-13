@@ -33,8 +33,27 @@ public class Util {
         return new File(gemHome, "bin/" + execName());
     }
 
+    public static File getBundleExecutable(String path) {
+        File parent = isJruby(path) || isCustom(path, execName())? new File(path) : new File(path).getParentFile().getParentFile();
+        return new File(parent, "bin/" + bundleExecName());
+    }
+
+    public static File getBundleExecutable(String path, String gemHome, String gemPath) {
+        for (String candidate : gemPath.split(File.pathSeparator)) {
+            File bin = new File(candidate, "bin/" + bundleExecName());
+            if (bin.exists()) {
+                return bin;
+            }
+        }
+        return new File(gemHome, "bin/" + bundleExecName());
+    }
+
     public static String execName() {
         return isWindows() ? "rake.bat" : "rake";
+    }
+
+    public static String bundleExecName() {
+        return isWindows() ? "bundle.bat" : "bundle";
     }
 
     public static boolean isWindows() {
