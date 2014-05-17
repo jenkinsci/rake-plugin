@@ -24,6 +24,13 @@ class RvmUtil {
             }
         }
 
+        if (rvm == null) {
+            String rvmPath = File.separator + "usr" + File.separator + "local" + File.separator + "rvm";
+            if (new File(rvmPath).exists()) {
+                rvm = new Rvm(rvmPath);
+            }
+        }
+
         return rvm;
     }
 
