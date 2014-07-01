@@ -150,7 +150,12 @@ public class Rake extends Builder {
         FilePath workingDir = build.getModuleRoot();
 
         if (rakeWorkingDir != null && rakeWorkingDir.length() > 0) {
-            workingDir = new FilePath(build.getModuleRoot(), rakeWorkingDir);
+            File file = new File(rakeWorkingDir);
+            if (file.isAbsolute()) {
+                workingDir = new FilePath(file);
+            } else {
+                workingDir = new FilePath(build.getModuleRoot(), rakeWorkingDir);
+            }
         }
 
         args.addTokenized(normalizedTasks);
