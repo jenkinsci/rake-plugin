@@ -180,8 +180,8 @@ class RvmUtil {
     private static Collection<FilePath> getRakeSpecifications(FilePath specifications)
             throws InterruptedException, IOException {
         Collection<FilePath> rakeSpecs = new LinkedHashSet<FilePath>();
-        
-        FilePath specs = specifications.list(rakeFilter);
+
+        List<FilePath> specs = specifications.list(rakeFilter);
         if(specs != null) {
             rakeSpecs.addAll(specs);
         }
