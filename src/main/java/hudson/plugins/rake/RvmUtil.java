@@ -49,8 +49,10 @@ class RvmUtil {
                         if (specifications != null) {
                             Collection<FilePath> specs = specifications.list(rakeFilter);
                             if (specs == null || specs.size() == 0) {
-                                // We did not find the rake gem in this gemset's bin directory; check in global
-                                specifications = getSpecifications(global);
+                                // We did not find the rake gem in this gemset's bin directory; check in global, if not null
+                                if (global != null) {
+                                    specifications = getSpecifications(global);
+                                }
                                 if (specifications != null) {
                                     specs = specifications.list(rakeFilter);
                                     if (specs == null || specs.size() == 0) {
