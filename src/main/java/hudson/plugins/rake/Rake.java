@@ -17,6 +17,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.model.Node;
+import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.ArgumentListBuilder;
 import hudson.util.FormValidation;
@@ -221,7 +222,7 @@ public class Rake extends Builder {
         return rakeWorkingDir;
     }
 
-    public static final class RakeDescriptor extends Descriptor<Builder> {
+    public static final class RakeDescriptor extends BuildStepDescriptor<Builder> {
 
         @CopyOnWrite
         private volatile RubyInstallation[] installations = new RubyInstallation[0];
@@ -232,6 +233,11 @@ public class Rake extends Builder {
         private RakeDescriptor() {
             super(Rake.class);
             load();
+        }
+
+        @Override
+        public boolean isApplicable(Class<? extends AbstractProject> aClass) {
+            return true;
         }
 
         @Override
