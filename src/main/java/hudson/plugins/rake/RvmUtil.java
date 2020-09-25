@@ -47,13 +47,13 @@ class RvmUtil {
                         String newpath = "";
                         FilePath specifications = getSpecifications(gemCandidate);
                         if (specifications != null) {
-                            Collection<FilePath> specs = specifications.list(rakeFilter);
-                            if (specs == null || specs.size() == 0) {
+                            Collection<FilePath> specs = getRakeSpecifications(specifications);
+                            if (specs.size() == 0) {
                                 // We did not find the rake gem in this gemset's bin directory; check in global
                                 specifications = getSpecifications(global);
                                 if (specifications != null) {
-                                    specs = specifications.list(rakeFilter);
-                                    if (specs == null || specs.size() == 0) {
+                                    specs = getRakeSpecifications(specifications);
+                                    if (specs.size() == 0) {
                                         // Rake not found in global either; this gemset is unusable
                                         continue;
                                     } else {
@@ -176,6 +176,26 @@ class RvmUtil {
             return rakePattern.matcher(pathname.getName()).matches();
         }
     }
+
+    private static Collection<FilePath> getRakeSpecifications(FilePath specifications)
+            throws InterruptedException, IOException {
+        Collection<FilePath> rakeSpecs = new LinkedHashSet<FilePath>();
+
+        List<FilePath> specs = specifications.list(rakeFilter);
+        if(specs != null) {
+            rakeSpecs.addAll(specs);
+        }
+        
+
+        for(FilePath subDirectory: specifications.listDirectories()) {
+            specs = subDirectory.list(rakeFilter);
+            if(specs != null) {
+                rakeSpecs.addAll(specs);
+            }
+        }
+        return rakeSpecs;
+    }
+
 
     private static FileFilter rakeFilter = new RakeSpecFilter();
 }
