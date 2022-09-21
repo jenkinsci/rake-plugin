@@ -105,7 +105,7 @@ class RvmUtil {
         for (FilePath gem : candidateGems) {
             File gemFile = new File(gem.toURI());
             String canonicalPath = gemFile.getCanonicalPath();
-            if ((canonicalPath.startsWith(currentGem + "@") && gem.child("specifications").exists())) {
+            if ((gemFile.getCanonicalFile().toPath().startsWith(currentGem + "@") && gem.child("specifications").exists())) {
                 paths.add(canonicalPath);
             }
         }
